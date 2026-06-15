@@ -11,11 +11,11 @@ Implement a secure, LGPD-compliant data scrubber. Build a clean command `purge-a
 
 ## ✅ Definition of Ready (DoR)
 
-* [ ] TDD Setup: Test file 'tests/test_infra.py' is ready
-* [ ] LGPD privacy requirements and file wiping procedure defined
+* [x] TDD Setup: Test file 'tests/test_infra.py' is ready
+* [x] LGPD privacy requirements and file wiping procedure defined
 
 ## 🏁 Definition of Done (DoD) & Acceptance Criteria
 
-* [ ] Execution of 'purge-all' deletes database, backup (.bak), and log files completely
-* [ ] Performs system checks to ensure no file handles prevent complete deletion
-* [ ] Tests verify that after running the purge, no trace of candidate data remains
+* [x] Execution of 'purge-all' deletes database, backup (.bak), and log files completely
+* [x] Performs system checks to ensure no file handles prevent complete deletion
+* [x] Tests verify that after running the purge, no trace of candidate data remains

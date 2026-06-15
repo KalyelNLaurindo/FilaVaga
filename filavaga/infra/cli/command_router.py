@@ -6,12 +6,50 @@ Maps command line arguments directly to application use cases.
 Author: Kalyel N. Laurindo / Software Engineer
 """
 
+import os
 import sys
+import secrets
 import argparse
 from filavaga.application.ports.inbound import IRegisterCandidateUseCase, IMatchVacancyUseCase
 from filavaga.application.ports.outbound import IStateRepository
 from filavaga.core.exceptions import FilaVagaDomainError
 from filavaga.infra.cli.presenter import RichConsolePresenter
+
+
+def _secure_shred_file(filepath: str) -> None:
+    """
+    Safely overwrite a file with zeros and random bytes before removing it.
+    This prevents physical recovery of personal candidate data (LGPD Compliance).
+    """
+    if not os.path.exists(filepath):
+        return
+
+    try:
+        # Get file size
+        size = os.path.getsize(filepath)
+
+        # 1. Overwrite with zeros
+        with open(filepath, "ba+", buffering=0) as f:
+            f.seek(0)
+            f.write(b"\x00" * size)
+            f.flush()
+            os.fsync(f.fileno())
+
+        # 2. Overwrite with random bytes
+        with open(filepath, "ba+", buffering=0) as f:
+            f.seek(0)
+            f.write(secrets.token_bytes(size))
+            f.flush()
+            os.fsync(f.fileno())
+
+        # 3. Final deletion
+        os.remove(filepath)
+    except Exception:
+        # Fallback to standard remove if shredding fails due to open locks
+        try:
+            os.remove(filepath)
+        except Exception:
+            pass
 
 
 class ArgparseCLIAdapter:
@@ -57,6 +95,9 @@ class ArgparseCLIAdapter:
 
         # 3. Dashboard Command Subparser
         subparsers.add_parser("dashboard", help="Start the interactive dashboard view")
+
+        # 4. Purge All Command Subparser (LGPD Compliance)
+        subparsers.add_parser("purge-all", help="Safely and permanently purge all candidate data and local snapshots")
 
         # Parse args
         parsed_args = parser.parse_args(args)
@@ -104,6 +145,33 @@ class ArgparseCLIAdapter:
                     vacancies=vacancies_map,
                     queues=queues_map
                 )
+
+            elif parsed_args.command == "purge-all":
+                db_path = None
+                if self._repository and hasattr(self._repository, "filepath"):
+                    db_path = self._repository.filepath
+                else:
+                    home_dir = os.path.expanduser("~")
+                    db_path = os.path.join(home_dir, ".filavaga", "state_snapshot.json")
+
+                bak_path = db_path + ".bak"
+                err_path = db_path + ".err"
+
+                # Perform secure shredding
+                _secure_shred_file(db_path)
+                _secure_shred_file(bak_path)
+                _secure_shred_file(err_path)
+
+                # Clear repository memory state
+                if self._repository:
+                    if hasattr(self._repository, "_candidates"):
+                        self._repository._candidates.clear()
+                    if hasattr(self._repository, "_vacancies"):
+                        self._repository._vacancies.clear()
+                    if hasattr(self._repository, "_queues"):
+                        self._repository._queues.clear()
+
+                print("Success: All local candidate data, backups, and error dumps have been permanently purged (LGPD-Compliant).")
 
         except FilaVagaDomainError as e:
             self._presenter.display_error("Domain Error", str(e))

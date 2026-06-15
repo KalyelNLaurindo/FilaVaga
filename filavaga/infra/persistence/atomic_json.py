@@ -34,6 +34,13 @@ class AtomicJsonRepository(IStateRepository):
         self._queues = {}
         self._load_state_from_disk()
 
+    @property
+    def filepath(self) -> str:
+        """
+        Return the absolute filepath of the state repository database.
+        """
+        return self._filepath
+
     def get_candidate(self, candidate_id: str) -> Candidate | None:
         with self._lock:
             return self._candidates.get(candidate_id)

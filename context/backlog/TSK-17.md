@@ -11,11 +11,11 @@ Configure the workspace using `pyproject.toml` and write build rules to generate
 
 ## ✅ Definition of Ready (DoR)
 
-* [ ] TDD Setup: PyInstaller config file / pipeline scripts prepared
-* [ ] All python dependencies declared in pyproject.toml
+* [x] TDD Setup: PyInstaller config file / pipeline scripts prepared
+* [x] All python dependencies declared in pyproject.toml
 
 ## 🏁 Definition of Done (DoD) & Acceptance Criteria
 
-* [ ] PyInstaller compilation runs without error, producing a standalone executable
-* [ ] Executable starts up and successfully executes the CLI commands offline
-* [ ] Pyproject metadata contains valid, compliant project metadata details
+* [x] PyInstaller compilation runs without error, producing a standalone executable
+* [x] Executable starts up and successfully executes the CLI commands offline
+* [x] Pyproject metadata contains valid, compliant project metadata details

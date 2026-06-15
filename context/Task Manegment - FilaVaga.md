@@ -145,7 +145,7 @@ Tasks are mapped bottom-up matching the hexagonal boundaries and dependencies.
   - _Metrics:_ Reach: 100 | Impact: 3.0 | Confidence: 1.0 | Effort: 1 (1 SP)
   - _RICE Score:_ 300.0 (High Priority Compliance)
   - _TDD Test File:_ `tests/test_infra.py`
-  - _Status:_ To Do
+  - _Status:_ Done
 
 ### **📦 Backlog Phase 6: Packaging & CI/CD Release**
 
@@ -154,18 +154,17 @@ Tasks are mapped bottom-up matching the hexagonal boundaries and dependencies.
   - _Metrics:_ Reach: 70 | Impact: 3.0 | Confidence: 0.8 | Effort: 2 (2 SP)
   - _RICE Score:_ 84.0
   - _TDD Test File:_ `tests/test_infra.py`
-  - _Status:_ To Do
+  - _Status:_ Done
 
 ## **3. 📋 Basic Markdown Kanban Board**
 
 ### **🔴 To Do (Ready for Development)**
 
-- [ ] [**TSK-16**](backlog/TSK-16.md)**:** LGPD-Compliant "purge-all" Safe Data Scrubber (Est. 1 SP)
-- [ ] [**TSK-17**](backlog/TSK-17.md)**:** PyProject Configuration & PyInstaller Standalone Compilation (Est. 2 SP)
+_None._
 
 ### **🟡 In Progress (Actively Being Built)**
 
-\_None.
+_None._
 
 ### **🔵 In Review (QA & Test Verification)**
 
@@ -188,5 +187,7 @@ _None._
 - [x] [**TSK-13**](backlog/TSK-13.md)**:** RichConsolePresenter TUI Rendering Engine (2 SP)
 - [x] [**TSK-14**](backlog/TSK-14.md)**:** Standard Error Structured JSON Logging & Diagnostics (2 SP)
 - [x] [**TSK-15**](backlog/TSK-15.md)**:** Self-Healing JSON Schema Validator & Backup Recovery (2 SP)
+- [x] [**TSK-16**](backlog/TSK-16.md)**:** LGPD-Compliant "purge-all" Safe Data Scrubber (1 SP)
+- [x] [**TSK-17**](backlog/TSK-17.md)**:** PyProject Configuration & PyInstaller Standalone Compilation (2 SP)
 
 _Signed by:_ Kalyel N. Laurindo / Project Owner

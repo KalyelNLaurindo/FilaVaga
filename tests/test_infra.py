@@ -410,5 +410,49 @@ def test_atomic_json_repository_auto_healing_no_backup(tmp_path):
     assert len(new_repo.get_all_candidates()) == 0
 
 
+def test_argparse_cli_adapter_purge_all(tmp_path, capsys):
+    """Verify that ArgparseCLIAdapter routes purge-all command, shreds files, and deletes them."""
+    from filavaga.infra.cli.command_router import ArgparseCLIAdapter
+    from filavaga.infra.persistence.atomic_json import AtomicJsonRepository
+    from filavaga.core.entities import Candidate
+    import os
+    
+    db_file = tmp_path / "state_snapshot.json"
+    bak_file = tmp_path / "state_snapshot.json.bak"
+    err_file = tmp_path / "state_snapshot.json.err"
+    
+    # 1. Setup repository and create some initial candidate data to write db and bak
+    repo = AtomicJsonRepository(str(db_file))
+    candidate = Candidate(
+        id="c_1", name="Maria Silva", sector_zone="SUL",
+        profession_code="4110-10", registered_at="2026-06-15T08:00:00Z"
+    )
+    repo.save_candidate(candidate)
+    repo.save_candidate(candidate)  # Creates backup file
+    
+    # Create fake .err file to make sure it gets cleaned up too
+    with open(err_file, "w", encoding="utf-8") as f:
+        f.write("fake error dump")
+        
+    # Verify files exist before purge
+    assert os.path.exists(db_file)
+    assert os.path.exists(bak_file)
+    assert os.path.exists(err_file)
+    
+    adapter = ArgparseCLIAdapter(None, None, repository=repo)
+    
+    # Run purge-all
+    adapter.run(["purge-all"])
+    
+    # 3. Assert all files are deleted
+    assert not os.path.exists(db_file)
+    assert not os.path.exists(bak_file)
+    assert not os.path.exists(err_file)
+    
+    captured = capsys.readouterr()
+    assert "Success" in captured.out or "Purge" in captured.out
+
+
+
 
 

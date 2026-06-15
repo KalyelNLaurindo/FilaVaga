@@ -183,6 +183,33 @@ Tasks are mapped bottom-up matching the hexagonal boundaries and dependencies.
   - _TDD Test File:_ `tests/test_infra.py`
   - _Status:_ To Do
 
+### **🔗 Backlog Phase 8: Integração & Extensibilidade da Plataforma**
+
+- [**TSK-22**](backlog/TSK-22.md)**: REST-like In-Process Event Bus**
+  - _Epic/Requirement Link:_ Future / Extensibility & Adapter Decoupling
+  - _Metrics:_ Reach: 90 | Impact: 3.0 | Confidence: 0.8 | Effort: 4 (4 SP)
+  - _RICE Score:_ 54.0
+  - _TDD Test File:_ `tests/test_usecases.py`
+  - _Status:_ To Do
+- [**TSK-23**](backlog/TSK-23.md)**: Vacancy Capacity Overflow Alerting**
+  - _Epic/Requirement Link:_ Future / Alerts & Observability
+  - _Metrics:_ Reach: 75 | Impact: 3.0 | Confidence: 0.9 | Effort: 1 (1 SP)
+  - _RICE Score:_ 202.5
+  - _TDD Test File:_ `tests/test_domain.py`
+  - _Status:_ To Do
+- [**TSK-24**](backlog/TSK-24.md)**: Candidate Profile Schema Validator**
+  - _Epic/Requirement Link:_ Future / DX & Data Integrity
+  - _Metrics:_ Reach: 90 | Impact: 2.0 | Confidence: 0.9 | Effort: 2 (2 SP)
+  - _RICE Score:_ 81.0
+  - _TDD Test File:_ `tests/test_domain.py`
+  - _Status:_ To Do
+- [**TSK-25**](backlog/TSK-25.md)**: Queue Snapshot Serializer & Replay**
+  - _Epic/Requirement Link:_ Future / Resilience & Disaster Recovery
+  - _Metrics:_ Reach: 80 | Impact: 3.0 | Confidence: 0.8 | Effort: 4 (4 SP)
+  - _RICE Score:_ 48.0
+  - _TDD Test File:_ `tests/test_infra.py`
+  - _Status:_ To Do
+
 ## **3. 📋 Basic Markdown Kanban Board**
 
 ### **🔴 To Do (Ready for Development)**
@@ -191,6 +218,13 @@ Tasks are mapped bottom-up matching the hexagonal boundaries and dependencies.
 - [ ] [**TSK-19**](backlog/TSK-19.md)**:** Historical Archiving & Snapshot Optimization (2 SP)
 - [ ] [**TSK-20**](backlog/TSK-20.md)**:** Interactive Configuration Wizard (2 SP)
 - [ ] [**TSK-21**](backlog/TSK-21.md)**:** Anonymized Placement Analytics Export (2 SP)
+
+**Phase 8 — Integração & Extensibilidade da Plataforma**
+- [ ] [**TSK-22**](backlog/TSK-22.md)**:** REST-like In-Process Event Bus (4 SP)
+- [ ] [**TSK-23**](backlog/TSK-23.md)**:** Vacancy Capacity Overflow Alerting (1 SP)
+- [ ] [**TSK-24**](backlog/TSK-24.md)**:** Candidate Profile Schema Validator (2 SP)
+- [ ] [**TSK-25**](backlog/TSK-25.md)**:** Queue Snapshot Serializer & Replay (4 SP)
+
 
 ### **🟡 In Progress (Actively Being Built)**
 

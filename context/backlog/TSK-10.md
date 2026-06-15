@@ -11,11 +11,11 @@ Implement the `AtomicJsonRepository` utilizing `threading.Lock` to enforce concu
 
 ## ✅ Definition of Ready (DoR)
 
-* [ ] TDD Setup: Test file 'tests/test_infra.py' is ready
-* [ ] Target file paths and thread lock architecture defined
+* [x] TDD Setup: Test file 'tests/test_infra.py' is ready
+* [x] Target file paths and thread lock architecture defined
 
 ## 🏁 Definition of Done (DoD) & Acceptance Criteria
 
-* [ ] Data serialization/deserialization to JSON is verified
-* [ ] os.replace ensures atomic writing sequences
-* [ ] Multi-threaded test scenarios confirm no race conditions occur during concurrent writes
+* [x] Data serialization/deserialization to JSON is verified
+* [x] os.replace ensures atomic writing sequences
+* [x] Multi-threaded test scenarios confirm no race conditions occur during concurrent writes

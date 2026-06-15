@@ -106,7 +106,7 @@ Tasks are mapped bottom-up matching the hexagonal boundaries and dependencies.
   - _Metrics:_ Reach: 100 | Impact: 3.0 | Confidence: 0.9 | Effort: 3 (3 SP)
   - _RICE Score:_ 90.0
   - _TDD Test File:_ `tests/test_infra.py`
-  - _Status:_ To Do
+  - _Status:_ Done
 - [**TSK-11**](backlog/TSK-11.md)**: SystemClock Adapter Implementation**
   - _Epic/Requirement Link:_ Port & Adapter Integration / Testability Isolation
   - _Metrics:_ Reach: 100 | Impact: 2.0 | Confidence: 1.0 | Effort: 1 (1 SP)

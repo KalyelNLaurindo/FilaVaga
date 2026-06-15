@@ -3,7 +3,7 @@
 ### **High-Performance In-Memory Local CLI Vacancy Matching Engine with Dynamic Temporal Logic**
 
 [![Stack Version](https://img.shields.io/badge/Python-3.10%2B-blue?style=for-the-badge&logo=python)](https://www.python.org/)
-[![Architecture](https://img.shields.io/badge/Architecture-Hexagonal-8A2BE2?style=for-the-badge)](https://en.wikipedia.org/wiki/Hexagonal_architecture_(software))
+[![Architecture](https://img.shields.io/badge/Architecture-Hexagonal-8A2BE2?style=for-the-badge)](<https://en.wikipedia.org/wiki/Hexagonal_architecture_(software)>)
 [![Dependencies](https://img.shields.io/badge/Dependencies-Standard%20Library-success?style=for-the-badge)](https://docs.python.org/3/)
 [![Testing Paradigm](https://img.shields.io/badge/Testing-TDD%20pytest-green?style=for-the-badge)](https://docs.pytest.org/)
 
@@ -11,14 +11,14 @@
 
 ## **🏛️ Repository Metadata & Context**
 
-| Property               | Description                                                                              |
-| :--------------------- | :--------------------------------------------------------------------------------------- |
-| **Role**               | Core Repository Architecture / Project Lead                                              |
-| **Target Segment**     | Public Employment Center Counselors (SINE - Sistema Nacional de Emprego)                 |
-| **Architecture Style** | Hexagonal Architecture (Ports & Adapters)                                                |
+| Property               | Description                                                                                 |
+| :--------------------- | :------------------------------------------------------------------------------------------ |
+| **Role**               | Core Repository Architecture / Project Lead                                                 |
+| **Target Segment**     | Public Employment Center Counselors (SINE - Sistema Nacional de Emprego)                    |
+| **Architecture Style** | Hexagonal Architecture (Ports & Adapters)                                                   |
 | **Execution Engine**   | In-Memory thread-safe queues (`collections.deque`) with atomic flat-file JSON serialization |
-| **Date of Creation**   | June 15, 2026                                                                            |
-| **Current Version**    | v1.1.0                                                                                   |
+| **Date of Creation**   | June 15, 2026                                                                               |
+| **Current Version**    | v1.1.0                                                                                      |
 
 ---
 
@@ -29,6 +29,7 @@
 Traditional public employment centers (such as SINE in Brazil) typically rely on centralized, high-latency legacy systems or informal local workarounds (like shared Excel sheets or paper registers) to manage candidate waitlists and job openings.
 
 In these operational setups, counselors manually search through flat tables to match incoming vacancies with job-seekers. Because these lists lack temporal awareness, automatic sorting, and state synchronization:
+
 1. **FIFO Priority is routinely violated**, skipping qualified candidates who registered early.
 2. **Vacancies expire unfilled** because expiration windows (TTL) are not proactively tracked.
 3. **Counselor efficiency drops by 40–60%** due to time wasted navigating spreadsheet conflicts and manual status lookups.
@@ -38,7 +39,7 @@ In these operational setups, counselors manually search through flat tables to m
 
 **FilaVaga** solves this operational bottleneck by introducing a lightweight, queue-native command-line application that runs locally on restricted SINE workstations. It transitions operations from a passive database-query model to a high-speed, structured FIFO queue matching flow.
 
-*   **Strategic Paradigm Shift:** FilaVaga replaces slow, error-prone manual Excel filters with an in-memory queue manager that instantly returns the highest-priority, eligible matching candidate for any given vacancy based on registration timestamps and CBO (Classificação Brasileira de Ocupações) codes.
+- **Strategic Paradigm Shift:** FilaVaga replaces slow, error-prone manual Excel filters with an in-memory queue manager that instantly returns the highest-priority, eligible matching candidate for any given vacancy based on registration timestamps and CBO (Classificação Brasileira de Ocupações) codes.
 
 ---
 
@@ -70,13 +71,13 @@ To guarantee business integrity, FilaVaga implements the following operational S
 
 The command-line interface is optimized for high keyboard throughput. Use the following core execution commands:
 
-| Command / Action              | Syntax                                                              | Description                                                                              | Example                                                                          |
-| :---------------------------- | :------------------------------------------------------------------ | :--------------------------------------------------------------------------------------- | :------------------------------------------------------------------------------- |
-| **Register Candidate**        | `register --name "<name>" --cbo "<cbo>" --zone "<zona>"`            | Appends a new candidate to the tail of the matching FIFO sub-queue.                      | `filavaga register --name "Maria Silva" --cbo "4110-10" --zone "SUL"`             |
-| **Interactive Match**         | `match --id "<vacancy_id>"`                                         | Validates vacancy TTL, pulls priority candidate, and starts interactive matching session.| `filavaga match --id "v_01h3nbfa4y1z8"`                                          |
-| **View Dashboard**            | `dashboard`                                                         | Renders the central console TUI displaying active queues and expiring vacancies.         | `filavaga dashboard`                                                             |
-| **Update Status Manually**    | `status-update --candidate "<id>" --to "<status>"`                  | Transitions candidate state machine (`PENDING`, `CONTACTED`, `PLACED`, `REJECTED`).      | `filavaga status-update --candidate "c_01h3n" --to "PLACED"`                     |
-| **Purge PII (LGPD Compliance)**| `purge-all`                                                         | Clears all personal identifiable information (PII) from local data directories.           | `filavaga purge-all`                                                             |
+| Command / Action                | Syntax                                                   | Description                                                                               | Example                                                               |
+| :------------------------------ | :------------------------------------------------------- | :---------------------------------------------------------------------------------------- | :-------------------------------------------------------------------- |
+| **Register Candidate**          | `register --name "<name>" --cbo "<cbo>" --zone "<zona>"` | Appends a new candidate to the tail of the matching FIFO sub-queue.                       | `filavaga register --name "Maria Silva" --cbo "4110-10" --zone "SUL"` |
+| **Interactive Match**           | `match --id "<vacancy_id>"`                              | Validates vacancy TTL, pulls priority candidate, and starts interactive matching session. | `filavaga match --id "v_01h3nbfa4y1z8"`                               |
+| **View Dashboard**              | `dashboard`                                              | Renders the central console TUI displaying active queues and expiring vacancies.          | `filavaga dashboard`                                                  |
+| **Update Status Manually**      | `status-update --candidate "<id>" --to "<status>"`       | Transitions candidate state machine (`PENDING`, `CONTACTED`, `PLACED`, `REJECTED`).       | `filavaga status-update --candidate "c_01h3n" --to "PLACED"`          |
+| **Purge PII (LGPD Compliance)** | `purge-all`                                              | Clears all personal identifiable information (PII) from local data directories.           | `filavaga purge-all`                                                  |
 
 > [!NOTE]
 > **Data & Validation Rules:**
@@ -91,22 +92,22 @@ The command-line interface is optimized for high keyboard throughput. Use the fo
 
 FilaVaga relies on a streamlined, zero-dependency local footprint to bypass administrative execution restrictions.
 
-| Architectural Layer        | Component / Technology                        | Technical Rationale                                                                       |
-| :------------------------- | :-------------------------------------------- | :---------------------------------------------------------------------------------------- |
-| **Client / Presenter**     | Python Native CLI (Argparse & Rich Output)   | Ensures 100% compatibility with terminal screen readers (NVDA/JAWS) and legacy consoles.  |
-| **Execution Engine**       | Python 3.10+ Standard Library                 | Eliminates runtime compilation issues. Uses standard collections (`collections.deque`).   |
-| **Memory Management**      | Thread-Safe Thread Locks (`threading.Lock`)    | Prevents in-memory race conditions during concurrent CLI session exports.                |
-| **Database & Ledger**      | In-Memory Index Hashmaps (`dict`)             | Achieves sub-millisecond query lookups ($O(1)$) without DBMS server dependencies.          |
-| **Persistence Drive**      | Atomic JSON Serializer (`state_snapshot.json`) | Protects data state by using double-buffer writes (temp files + atomic renames).           |
+| Architectural Layer    | Component / Technology                         | Technical Rationale                                                                      |
+| :--------------------- | :--------------------------------------------- | :--------------------------------------------------------------------------------------- |
+| **Client / Presenter** | Python Native CLI (Argparse & Rich Output)     | Ensures 100% compatibility with terminal screen readers (NVDA/JAWS) and legacy consoles. |
+| **Execution Engine**   | Python 3.10+ Standard Library                  | Eliminates runtime compilation issues. Uses standard collections (`collections.deque`).  |
+| **Memory Management**  | Thread-Safe Thread Locks (`threading.Lock`)    | Prevents in-memory race conditions during concurrent CLI session exports.                |
+| **Database & Ledger**  | In-Memory Index Hashmaps (`dict`)              | Achieves sub-millisecond query lookups ($O(1)$) without DBMS server dependencies.        |
+| **Persistence Drive**  | Atomic JSON Serializer (`state_snapshot.json`) | Protects data state by using double-buffer writes (temp files + atomic renames).         |
 
 ---
 
 ## **🏗️ 4. Core Architectural Premises**
 
-*   **Premise 4.1 - Hexagonal Boundaries:** Business rules (`filavaga.core`) are completely isolated. They do not import from persistence, presentation layers, or OS-level standard modules.
-*   **Premise 4.2 - Test-Driven Development (TDD):** A strict Red-Green-Refactor development cycle is enforced. Invariants and state machine checks are fully tested.
-*   **Premise 4.3 - Privacy & Local Compliance:** In accordance with LGPD, no PII (Brazilian CPFs, exact addresses) is stored in the database snapshot files. Obfuscated UUID keys are used internally.
-*   **Premise 4.4 - Lazy Evaluation of Deadlines:** Rather than running background daemon processes that consume CPU cycles, vacancy deadlines (TTL) are validated lazily at query/evaluation time.
+- **Premise 4.1 - Hexagonal Boundaries:** Business rules (`filavaga.core`) are completely isolated. They do not import from persistence, presentation layers, or OS-level standard modules.
+- **Premise 4.2 - Test-Driven Development (TDD):** A strict Red-Green-Refactor development cycle is enforced. Invariants and state machine checks are fully tested.
+- **Premise 4.3 - Privacy & Local Compliance:** In accordance with LGPD, no PII (Brazilian CPFs, exact addresses) is stored in the database snapshot files. Obfuscated UUID keys are used internally.
+- **Premise 4.4 - Lazy Evaluation of Deadlines:** Rather than running background daemon processes that consume CPU cycles, vacancy deadlines (TTL) are validated lazily at query/evaluation time.
 
 ---
 
@@ -163,12 +164,14 @@ filavaga-cli/
 ### **6.2. Initial Bootstrap Sequence**
 
 1. Clone this repository to your local workstation:
+
    ```bash
    git clone https://github.com/your-org/filavaga-cli.git
    cd filavaga-cli
    ```
 
 2. Create and activate a local Python virtual environment:
+
    ```bash
    python -m venv .venv
    # On Windows:
@@ -187,11 +190,13 @@ filavaga-cli/
 Ensure your modifications pass the repository quality gates before submitting a Pull Request:
 
 - **Execute primary system test engine (pytest)**:
+
   ```bash
   pytest tests/
   ```
 
 - **Verify static type constraints**:
+
   ```bash
   mypy filavaga/
   ```

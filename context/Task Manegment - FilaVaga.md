@@ -156,11 +156,41 @@ Tasks are mapped bottom-up matching the hexagonal boundaries and dependencies.
   - _TDD Test File:_ `tests/test_infra.py`
   - _Status:_ Done
 
+### **🔮 Backlog Phase 7: Future Roadmap & Analytical Enhancements**
+
+- [**TSK-18**](backlog/TSK-18.md)**: CSV Data Import Adapter**
+  - _Epic/Requirement Link:_ Future Enhancements / Legacy System Data Integration
+  - _Metrics:_ Reach: 80 | Impact: 2.0 | Confidence: 0.9 | Effort: 2 (2 SP)
+  - _RICE Score:_ 72.0
+  - _TDD Test File:_ `tests/test_infra.py`
+  - _Status:_ To Do
+- [**TSK-19**](backlog/TSK-19.md)**: Historical Archiving & Snapshot Optimization**
+  - _Epic/Requirement Link:_ Future Enhancements / Database Performance Optimization & LGPD Compliance
+  - _Metrics:_ Reach: 90 | Impact: 2.5 | Confidence: 0.9 | Effort: 2 (2 SP)
+  - _RICE Score:_ 101.25
+  - _TDD Test File:_ `tests/test_infra.py`
+  - _Status:_ To Do
+- [**TSK-20**](backlog/TSK-20.md)**: Interactive Configuration Wizard**
+  - _Epic/Requirement Link:_ Future Enhancements / UX Hardening
+  - _Metrics:_ Reach: 75 | Impact: 2.0 | Confidence: 0.9 | Effort: 2 (2 SP)
+  - _RICE Score:_ 67.5
+  - _TDD Test File:_ `tests/test_infra.py`
+  - _Status:_ To Do
+- [**TSK-21**](backlog/TSK-21.md)**: Anonymized Placement Analytics Export**
+  - _Epic/Requirement Link:_ Future Enhancements / System Telemetry and Regional Reporting
+  - _Metrics:_ Reach: 80 | Impact: 2.0 | Confidence: 0.8 | Effort: 2 (2 SP)
+  - _RICE Score:_ 64.0
+  - _TDD Test File:_ `tests/test_infra.py`
+  - _Status:_ To Do
+
 ## **3. 📋 Basic Markdown Kanban Board**
 
 ### **🔴 To Do (Ready for Development)**
 
-_None._
+- [ ] [**TSK-18**](backlog/TSK-18.md)**:** CSV Data Import Adapter (2 SP)
+- [ ] [**TSK-19**](backlog/TSK-19.md)**:** Historical Archiving & Snapshot Optimization (2 SP)
+- [ ] [**TSK-20**](backlog/TSK-20.md)**:** Interactive Configuration Wizard (2 SP)
+- [ ] [**TSK-21**](backlog/TSK-21.md)**:** Anonymized Placement Analytics Export (2 SP)
 
 ### **🟡 In Progress (Actively Being Built)**
 

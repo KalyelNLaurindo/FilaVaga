@@ -11,11 +11,12 @@ Implement the `SystemClock` adapter providing ISO-8601 UTC time strings. This ad
 
 ## ✅ Definition of Ready (DoR)
 
-* [ ] TDD Setup: Test file 'tests/test_infra.py' is ready
-* [ ] Outbound IClock interface defined
+* [x] TDD Setup: Test file 'tests/test_infra.py' is ready
+* [x] Outbound IClock interface defined
 
 ## 🏁 Definition of Done (DoD) & Acceptance Criteria
 
-* [ ] SystemClock returns correct ISO-8601 UTC timestamp format
-* [ ] SystemClock correctly maps to python datetime module
-* [ ] Tests demonstrate mocking and overriding system clock values
+* [x] SystemClock returns correct ISO-8601 UTC timestamp format
+* [x] SystemClock correctly maps to python datetime module
+* [x] Tests demonstrate mocking and overriding system clock values
+

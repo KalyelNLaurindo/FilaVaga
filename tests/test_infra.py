@@ -75,3 +75,34 @@ def test_atomic_json_repository_concurrency(tmp_path):
     assert len(all_candidates) == 20
     for i in range(20):
         assert f"c_{i}" in all_candidates
+
+
+def test_system_clock_utc_timezone():
+    """Verify that SystemClock returns a timezone-aware UTC datetime and matches format."""
+    from filavaga.infra.persistence.system_clock import SystemClock
+    from datetime import datetime, timezone
+
+    clock = SystemClock()
+    now_val = clock.now()
+
+    assert isinstance(now_val, datetime)
+    assert now_val.tzinfo is not None
+    assert now_val.tzinfo.utcoffset(now_val) == timezone.utc.utcoffset(now_val)
+    
+    # Verify it produces valid ISO-8601 string containing +00:00 (since it is UTC timezone-aware)
+    iso_str = now_val.isoformat()
+    assert "+00:00" in iso_str
+
+
+def test_system_clock_override_and_mocking():
+    """Verify that SystemClock supports overriding for test isolation."""
+    from filavaga.infra.persistence.system_clock import SystemClock
+    from datetime import datetime, timezone
+
+    # 1. Override via instantiation parameter
+    fixed_time = datetime(2026, 6, 15, 12, 0, 0, tzinfo=timezone.utc)
+    clock_fixed = SystemClock(override_time=fixed_time)
+    
+    assert clock_fixed.now() == fixed_time
+    assert clock_fixed.now().isoformat() == "2026-06-15T12:00:00+00:00"
+

@@ -11,11 +11,11 @@ Implement a self-healing startup validation routine. Upon starting, parse the ac
 
 ## ✅ Definition of Ready (DoR)
 
-* [ ] TDD Setup: Test file 'tests/test_infra.py' is ready
-* [ ] Database recovery and backup naming convention established
+* [x] TDD Setup: Test file 'tests/test_infra.py' is ready
+* [x] Database recovery and backup naming convention established
 
 ## 🏁 Definition of Done (DoD) & Acceptance Criteria
 
-* [ ] Startup parses database and catches json.JSONDecodeError or schema issues
-* [ ] Isolates corrupt files and successfully restores the .bak snapshot
-* [ ] Integration tests simulate database corruption to verify self-healing logic works
+* [x] Startup parses database and catches json.JSONDecodeError or schema issues
+* [x] Isolates corrupt files and successfully restores the .bak snapshot
+* [x] Integration tests simulate database corruption to verify self-healing logic works

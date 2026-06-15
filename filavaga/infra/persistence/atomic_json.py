@@ -70,7 +70,7 @@ class AtomicJsonRepository(IStateRepository):
             self._save_state_to_disk()
 
     def _load_state_from_disk(self) -> None:
-        """Read snapshot from disk and rebuild domain objects in memory."""
+        """Read snapshot from disk, validate its schema and rebuild domain objects in memory."""
         if not os.path.exists(self._filepath):
             logger.info("No existing snapshot found at %s. Initializing empty state.", self._filepath)
             return
@@ -79,6 +79,14 @@ class AtomicJsonRepository(IStateRepository):
             logger.debug("Loading state snapshot from %s.", self._filepath)
             with open(self._filepath, "r", encoding="utf-8") as f:
                 data = json.load(f)
+                
+            if not isinstance(data, dict):
+                raise ValueError("Root element of state snapshot must be a JSON object.")
+                
+            required_sections = ["metadata", "candidates", "vacancies", "queues"]
+            for section in required_sections:
+                if section not in data:
+                    raise KeyError(f"Missing required section '{section}' in state snapshot.")
                 
             candidates_data = data.get("candidates", {})
             for c_id, c_val in candidates_data.items():
@@ -112,20 +120,35 @@ class AtomicJsonRepository(IStateRepository):
                 )
             logger.info("Successfully loaded state snapshot from disk.")
         except Exception as e:
-            # Under resilient guidelines, if the active snapshot is corrupted,
-            # we try to restore from .bak
-            logger.warning("Active snapshot file at %s is corrupted or unreadable. Error: %s. Attempting backup recovery.", self._filepath, e)
+            logger.warning("Active snapshot file at %s is corrupted or violates schema. Error: %s. Isolating to .err and attempting backup recovery.", self._filepath, e)
+            
+            # Isolate the corrupt file
+            err_path = self._filepath + ".err"
+            try:
+                if os.path.exists(self._filepath):
+                    if os.path.exists(err_path):
+                        os.remove(err_path)
+                    os.rename(self._filepath, err_path)
+            except Exception as isolation_err:
+                logger.error("Failed to isolate corrupted file to %s. Error: %s", err_path, isolation_err)
+                
             bak_path = self._filepath + ".bak"
             if os.path.exists(bak_path):
-                # Swap and reload
+                # Restore backup
                 try:
                     logger.info("Restoring backup from %s.", bak_path)
                     shutil.copy2(bak_path, self._filepath)
                     self._load_state_from_disk()
                 except Exception as ex:
-                    logger.error("Failed to restore backup snapshot. Error: %s", ex)
+                    logger.error("Failed to restore backup snapshot. Error: %s. Resetting to empty state.", ex)
+                    self._candidates.clear()
+                    self._vacancies.clear()
+                    self._queues.clear()
             else:
-                logger.error("No backup snapshot file found at %s.", bak_path)
+                logger.error("No backup snapshot file found at %s. Initializing clean empty state.", bak_path)
+                self._candidates.clear()
+                self._vacancies.clear()
+                self._queues.clear()
 
     def _save_state_to_disk(self) -> None:
         """Serialize memory index structures and write atomically to disk."""

@@ -319,4 +319,96 @@ def test_json_logging_format_and_stderr(capsys):
     assert "ValueError: Simulated error" in log_record_exc["exception"]
 
 
+def test_atomic_json_repository_auto_healing_decode_error(tmp_path):
+    """Verify that AtomicJsonRepository isolates corrupted JSON to .err and restores from .bak."""
+    from filavaga.infra.persistence.atomic_json import AtomicJsonRepository
+    from filavaga.core.entities import Candidate
+    import os
+    
+    db_file = tmp_path / "state_snapshot.json"
+    bak_file = tmp_path / "state_snapshot.json.bak"
+    err_file = tmp_path / "state_snapshot.json.err"
+    
+    # 1. Create a valid initial state to produce a backup
+    repo = AtomicJsonRepository(str(db_file))
+    candidate = Candidate(
+        id="c_1", name="Maria Silva", sector_zone="SUL",
+        profession_code="4110-10", registered_at="2026-06-15T08:00:00Z"
+    )
+    repo.save_candidate(candidate)
+    # Save a second time to ensure backup is created
+    repo.save_candidate(candidate)
+    
+    # Verify .bak exists and is valid
+    assert os.path.exists(bak_file)
+    
+    # 2. Corrupt the active database file (write invalid JSON syntax)
+    with open(db_file, "w", encoding="utf-8") as f:
+        f.write("{invalid_json_here")
+        
+    # 3. Instantiate a new repository which will load from disk, trigger decode error, and heal itself
+    new_repo = AtomicJsonRepository(str(db_file))
+    
+    # Verify that the corrupt file was isolated to .err
+    assert os.path.exists(err_file)
+    with open(err_file, "r", encoding="utf-8") as f:
+        assert f.read() == "{invalid_json_here"
+        
+    # Verify that state was restored from backup successfully
+    assert new_repo.get_candidate("c_1") == candidate
+
+
+def test_atomic_json_repository_auto_healing_schema_error(tmp_path):
+    """Verify that AtomicJsonRepository isolates JSON violating schema rules and restores from .bak."""
+    from filavaga.infra.persistence.atomic_json import AtomicJsonRepository
+    from filavaga.core.entities import Candidate
+    import os
+    import json
+    
+    db_file = tmp_path / "state_snapshot.json"
+    bak_file = tmp_path / "state_snapshot.json.bak"
+    err_file = tmp_path / "state_snapshot.json.err"
+    
+    # 1. Create a valid initial state
+    repo = AtomicJsonRepository(str(db_file))
+    candidate = Candidate(
+        id="c_1", name="Maria Silva", sector_zone="SUL",
+        profession_code="4110-10", registered_at="2026-06-15T08:00:00Z"
+    )
+    repo.save_candidate(candidate)
+    # Save a second time to ensure backup is created
+    repo.save_candidate(candidate)
+    
+    # 2. Corrupt active file with a valid JSON but missing the candidates schema section
+    corrupt_schema = {"metadata": {"app_id": "filavaga-sine-local", "schema_version": "1.0"}}
+    with open(db_file, "w", encoding="utf-8") as f:
+        json.dump(corrupt_schema, f)
+        
+    # 3. Instantiate new repository triggering validation error and backup recovery
+    new_repo = AtomicJsonRepository(str(db_file))
+    
+    # Verify isolation and recovery
+    assert os.path.exists(err_file)
+    assert new_repo.get_candidate("c_1") == candidate
+
+
+def test_atomic_json_repository_auto_healing_no_backup(tmp_path):
+    """Verify that if both active and backup are corrupt or missing, it falls back to empty state."""
+    from filavaga.infra.persistence.atomic_json import AtomicJsonRepository
+    import os
+    
+    db_file = tmp_path / "state_snapshot.json"
+    
+    # Write corrupt JSON with no backup file present
+    with open(db_file, "w", encoding="utf-8") as f:
+        f.write("{corrupt_and_no_backup")
+        
+    new_repo = AtomicJsonRepository(str(db_file))
+    
+    # Verify that it isolated the file and initialized empty structures
+    assert os.path.exists(tmp_path / "state_snapshot.json.err")
+    assert len(new_repo.get_all_candidates()) == 0
+
+
+
 

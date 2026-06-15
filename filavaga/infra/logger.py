@@ -41,6 +41,19 @@ class JsonFormatter(logging.Formatter):
         return json.dumps(log_data, ensure_ascii=False)
 
 
+class StderrProxy:
+    """
+    Proxy wrapper to dynamically retrieve sys.stderr.
+    
+    Prevents caching closed sys.stderr references in testing environments.
+    """
+    def write(self, data: str) -> int:
+        return sys.stderr.write(data)
+
+    def flush(self) -> None:
+        sys.stderr.flush()
+
+
 def configure_logging(level: int = logging.INFO) -> None:
     """
     Configure the default FilaVaga logger to output JSON to stderr.
@@ -52,8 +65,8 @@ def configure_logging(level: int = logging.INFO) -> None:
     if logger.handlers:
         logger.handlers.clear()
         
-    # Create stderr handler
-    handler = logging.StreamHandler(sys.stderr)
+    # Create stderr handler with dynamic sys.stderr proxy
+    handler = logging.StreamHandler(StderrProxy())  # type: ignore
     handler.setLevel(level)
     
     # Attach custom JSON formatter

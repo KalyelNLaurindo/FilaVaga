@@ -1,0 +1,13 @@
+{
+  "app_id": "filavaga-sine-local",
+  "schema_version": "1.0",
+  "persistence": {
+    "directory": "~/.filavaga",
+    "filename": "state_snapshot.json",
+    "backup_filename": "state_snapshot.json.bak"
+  },
+  "business_rules": {
+    "default_vacancy_ttl_hours": 24,
+    "candidate_pruning_days": 30
+  }
+}

@@ -110,3 +110,81 @@ def test_candidate_state_transitions():
         candidate_2.transition_to("CONTACTED")
 
 
+def test_vacancy_creation_and_expiration():
+    """Verify that a Vacancy entity is created correctly and supports dynamic expiration checks."""
+    from filavaga.core.entities import Vacancy
+    from datetime import datetime
+
+    vacancy = Vacancy(
+        id="v_01h3nbfa4y1z8",
+        title="Auxiliar Administrativo",
+        profession_code="4110-10",
+        sector_zone="SUL",
+        capacity=2,
+        created_at="2026-06-15T10:00:00Z",
+        expires_at="2026-06-16T10:00:00Z"
+    )
+
+    assert vacancy.id == "v_01h3nbfa4y1z8"
+    assert vacancy.title == "Auxiliar Administrativo"
+    assert vacancy.profession_code == "4110-10"
+    assert vacancy.sector_zone == "SUL"
+    assert vacancy.capacity == 2
+    assert vacancy.created_at == "2026-06-15T10:00:00Z"
+    assert vacancy.expires_at == "2026-06-16T10:00:00Z"
+    assert vacancy.placed_candidate_ids == []
+
+    # Test expiration using datetime object
+    assert not vacancy.is_expired(datetime.fromisoformat("2026-06-16T09:59:59Z".replace("Z", "+00:00")))
+    assert vacancy.is_expired(datetime.fromisoformat("2026-06-16T10:00:00Z".replace("Z", "+00:00")))
+    assert vacancy.is_expired(datetime.fromisoformat("2026-06-16T10:00:01Z".replace("Z", "+00:00")))
+
+    # Test expiration using string format
+    assert not vacancy.is_expired("2026-06-16T09:59:59Z")
+    assert vacancy.is_expired("2026-06-16T10:00:00Z")
+
+
+def test_vacancy_candidate_placement():
+    """Verify that candidate placement respects expiration and capacity constraints."""
+    from filavaga.core.entities import Vacancy
+    from filavaga.core.exceptions import EntityExpiredError, CapacityLimitExceededError
+
+    vacancy = Vacancy(
+        id="v_01h3nbfa4y1z8",
+        title="Auxiliar Administrativo",
+        profession_code="4110-10",
+        sector_zone="SUL",
+        capacity=2,
+        created_at="2026-06-15T10:00:00Z",
+        expires_at="2026-06-16T10:00:00Z"
+    )
+
+    # 1. Placement in active vacancy with capacity available (Valid)
+    vacancy.place_candidate("c_1", "2026-06-15T12:00:00Z")
+    assert vacancy.placed_candidate_ids == ["c_1"]
+    assert not vacancy.is_full()
+
+    # 2. Place second candidate (Valid, capacity reached)
+    vacancy.place_candidate("c_2", "2026-06-15T13:00:00Z")
+    assert vacancy.placed_candidate_ids == ["c_1", "c_2"]
+    assert vacancy.is_full()
+
+    # 3. Try to place third candidate (Invalid, capacity limit exceeded)
+    with pytest.raises(CapacityLimitExceededError):
+        vacancy.place_candidate("c_3", "2026-06-15T14:00:00Z")
+
+    # 4. Try to place candidate in expired vacancy (Invalid, expired TTL)
+    vacancy_expired = Vacancy(
+        id="v_expired",
+        title="Pedreiro",
+        profession_code="7152-10",
+        sector_zone="NORTE",
+        capacity=1,
+        created_at="2026-06-15T10:00:00Z",
+        expires_at="2026-06-16T10:00:00Z"
+    )
+    with pytest.raises(EntityExpiredError):
+        vacancy_expired.place_candidate("c_4", "2026-06-16T12:00:00Z")
+
+
+

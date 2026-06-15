@@ -11,11 +11,11 @@ Implement `QueueManager` application service implementing the `IRegisterCandidat
 
 ## ✅ Definition of Ready (DoR)
 
-* [ ] TDD Setup: Test file 'tests/test_usecases.py' is ready
-* [ ] Port definitions (TSK-07) and Core domain logic (TSK-03, TSK-04, TSK-06) completed
+* [x] TDD Setup: Test file 'tests/test_usecases.py' is ready
+* [x] Port definitions (TSK-07) and Core domain logic (TSK-03, TSK-04, TSK-06) completed
 
 ## 🏁 Definition of Done (DoD) & Acceptance Criteria
 
-* [ ] QueueManager handles candidate registration use case completely
-* [ ] Dependencies are strictly injected via constructors (dependency injection)
-* [ ] Mocked repositories and clock verify correct invocation sequences
+* [x] QueueManager handles candidate registration use case completely
+* [x] Dependencies are strictly injected via constructors (dependency injection)
+* [x] Mocked repositories and clock verify correct invocation sequences

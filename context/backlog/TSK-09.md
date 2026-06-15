@@ -11,11 +11,11 @@ Develop the `MatchEngine` service implementing `IMatchVacancyUseCase`. It must i
 
 ## ✅ Definition of Ready (DoR)
 
-* [ ] TDD Setup: Test file 'tests/test_usecases.py' is ready
-* [ ] Lazy-evaluated TTL and matching filters defined
+* [x] TDD Setup: Test file 'tests/test_usecases.py' is ready
+* [x] Lazy-evaluated TTL and matching filters defined
 
 ## 🏁 Definition of Done (DoD) & Acceptance Criteria
 
-* [ ] Matches candidates to vacancies based on sector, role code, and availability
-* [ ] Expired vacancies are skipped dynamically during matching
-* [ ] Unit tests verify edge cases for partially filled, fully filled, and expired vacancies
+* [x] Matches candidates to vacancies based on sector, role code, and availability
+* [x] Expired vacancies are skipped dynamically during matching
+* [x] Unit tests verify edge cases for partially filled, fully filled, and expired vacancies

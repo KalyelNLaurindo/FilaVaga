@@ -121,3 +121,90 @@ def test_queue_manager_register_candidate():
     with pytest.raises(FilaVagaDomainError):
         manager.register_candidate("", "4110-10", "SUL")
 
+
+def test_match_engine_scenarios():
+    """Verify that MatchEngine implements all matching heuristics, TTL validation and capacity locks."""
+    from filavaga.application.services.match_engine import MatchEngine
+    from filavaga.core.entities import Candidate, Vacancy, Queue
+    from filavaga.core.exceptions import (
+        EntityNotFoundError,
+        EntityExpiredError,
+        CapacityLimitExceededError,
+    )
+
+    repo = MockStateRepository()
+    clock = MockClock("2026-06-15T12:00:00Z")
+    engine = MatchEngine(repo, clock)
+
+    # 1. Non-existent vacancy raises EntityNotFoundError
+    with pytest.raises(EntityNotFoundError):
+        engine.match_vacancy("v_non_exist")
+
+    # 2. Setup mock vacancy
+    vacancy = Vacancy(
+        id="v_01", title="Auxiliar", profession_code="4110-10",
+        sector_zone="SUL", capacity=2, created_at="2026-06-15T10:00:00Z",
+        expires_at="2026-06-16T10:00:00Z"
+    )
+    repo.save_vacancy(vacancy)
+
+    # 3. Setup candidates
+    # C_A: Valid CBO and Zone, registered early
+    c_a = Candidate(
+        id="c_a", name="Candidate A", sector_zone="SUL",
+        profession_code="4110-10", registered_at="2026-06-15T08:00:00Z",
+        status="PENDING"
+    )
+    # C_B: Valid CBO but different Zone (NORTE)
+    c_b = Candidate(
+        id="c_b", name="Candidate B", sector_zone="NORTE",
+        profession_code="4110-10", registered_at="2026-06-15T08:30:00Z",
+        status="PENDING"
+    )
+    # C_C: Valid CBO and Zone, registered late
+    c_c = Candidate(
+        id="c_c", name="Candidate C", sector_zone="SUL",
+        profession_code="4110-10", registered_at="2026-06-15T09:00:00Z",
+        status="PENDING"
+    )
+
+    repo.save_candidate(c_a)
+    repo.save_candidate(c_b)
+    repo.save_candidate(c_c)
+
+    queue = Queue(profession_code="4110-10", candidate_ids=["c_a", "c_b", "c_c"])
+    repo.save_queue(queue)
+
+    # First match: should pick C_A (early, matches zone SUL)
+    matched_1 = engine.match_vacancy("v_01")
+    assert matched_1 == c_a
+    assert matched_1.status == "CONTACTED"
+    assert vacancy.placed_candidate_ids == ["c_a"]
+
+    # Second match: should pick C_C (skips C_B because zone doesn't match; skips C_A because status is CONTACTED)
+    matched_2 = engine.match_vacancy("v_01")
+    assert matched_2 == c_c
+    assert matched_2.status == "CONTACTED"
+    assert vacancy.placed_candidate_ids == ["c_a", "c_c"]
+    assert vacancy.is_full()
+
+    # Third match on a full vacancy: raises CapacityLimitExceededError
+    with pytest.raises(CapacityLimitExceededError):
+        engine.match_vacancy("v_01")
+
+    # 4. Try match on an expired vacancy: raises EntityExpiredError
+    vacancy_expired = Vacancy(
+        id="v_exp", title="Auxiliar Exp", profession_code="4110-10",
+        sector_zone="SUL", capacity=2, created_at="2026-06-15T10:00:00Z",
+        expires_at="2026-06-16T10:00:00Z"
+    )
+    repo.save_vacancy(vacancy_expired)
+
+    # Advance clock beyond expiration time
+    clock_expired = MockClock("2026-06-17T12:00:00Z")
+    engine_expired = MatchEngine(repo, clock_expired)
+
+    with pytest.raises(EntityExpiredError):
+        engine_expired.match_vacancy("v_exp")
+
+

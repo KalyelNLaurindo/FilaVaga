@@ -97,7 +97,7 @@ Tasks are mapped bottom-up matching the hexagonal boundaries and dependencies.
   - _Metrics:_ Reach: 95 | Impact: 3.0 | Confidence: 0.8 | Effort: 3 (3 SP)
   - _RICE Score:_ 76.0
   - _TDD Test File:_ `tests/test_usecases.py`
-  - _Status:_ To Do
+  - _Status:_ Done
 
 ### **🔌 Backlog Phase 4: Interface Adapters & Persistence Adapters**
 
@@ -160,7 +160,6 @@ Tasks are mapped bottom-up matching the hexagonal boundaries and dependencies.
 
 ### **🔴 To Do (Ready for Development)**
 
-- [ ] [**TSK-09**](backlog/TSK-09.md)**:** MatchEngine Multi-Filter Matching Algorithm (Est. 3 SP)
 - [ ] [**TSK-10**](backlog/TSK-10.md)**:** Thread-Safe Atomic JSON Persistence Engine (Est. 3 SP)
 - [ ] [**TSK-11**](backlog/TSK-11.md)**:** SystemClock Adapter Implementation (Est. 1 SP)
 - [ ] [**TSK-12**](backlog/TSK-12.md)**:** Argparse Command Router & Controller Adapter (Est. 2 SP)
@@ -188,5 +187,6 @@ _None._
 - [x] [**TSK-06**](backlog/TSK-06.md)**:** Queue Aggregate & Inbound Sequence Rules (2 SP)
 - [x] [**TSK-07**](backlog/TSK-07.md)**:** Port Abstractions (Inbound & Outbound Interfaces) (1 SP)
 - [x] [**TSK-08**](backlog/TSK-08.md)**:** QueueManager Application Service Execution Logic (2 SP)
+- [x] [**TSK-09**](backlog/TSK-09.md)**:** MatchEngine Multi-Filter Matching Algorithm (3 SP)
 
 _Signed by:_ Kalyel N. Laurindo / Project Owner

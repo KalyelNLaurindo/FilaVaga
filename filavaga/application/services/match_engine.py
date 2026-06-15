@@ -7,10 +7,13 @@ from the FIFO queue that matches the vacancy criteria (CBO, zone, and availabili
 Author: Kalyel N. Laurindo / Software Engineer
 """
 
+import logging
 from filavaga.application.ports.inbound import IMatchVacancyUseCase
 from filavaga.application.ports.outbound import IClock, IStateRepository
 from filavaga.core.entities import Candidate
 from filavaga.core.exceptions import EntityNotFoundError
+
+logger = logging.getLogger("filavaga")
 
 
 class MatchEngine(IMatchVacancyUseCase):
@@ -29,9 +32,11 @@ class MatchEngine(IMatchVacancyUseCase):
         Evaluate vacancy, retrieve the matching FIFO candidate, transition their status,
         and update state storage.
         """
+        logger.info("Evaluating match for vacancy ID '%s'.", vacancy_id)
         # Retrieve vacancy
         vacancy = self._repository.get_vacancy(vacancy_id)
         if not vacancy:
+            logger.warning("Vacancy '%s' not found.", vacancy_id)
             raise EntityNotFoundError(f"Vacancy {vacancy_id} not found.")
 
         # Invariant checks: dynamic lazy-evaluated TTL and capacity verification
@@ -49,6 +54,7 @@ class MatchEngine(IMatchVacancyUseCase):
         # Retrieve the queue for the vacancy's profession CBO code
         queue = self._repository.get_queue(vacancy.profession_code)
         if not queue:
+            logger.warning("No FIFO queue found for profession CBO '%s'.", vacancy.profession_code)
             return None
 
         # Search candidates in FIFO queue priority sequence (already sorted)
@@ -67,6 +73,8 @@ class MatchEngine(IMatchVacancyUseCase):
                 vacancy.place_candidate(candidate.id, current_time)
                 self._repository.save_vacancy(vacancy)
 
+                logger.info("Successfully matched candidate '%s' (ID: %s) to vacancy '%s'.", candidate.name, candidate.id, vacancy_id)
                 return candidate
 
+        logger.warning("No pending candidate in FIFO queue matching requirements for vacancy '%s'.", vacancy_id)
         return None

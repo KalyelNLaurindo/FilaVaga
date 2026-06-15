@@ -276,3 +276,47 @@ def test_presenter_dashboard():
     assert "Auxiliar" in output
 
 
+def test_json_logging_format_and_stderr(capsys):
+    """Verify that configure_logging sets up structured JSON logs writing exclusively to stderr."""
+    from filavaga.infra.logger import configure_logging
+    import logging
+    import json
+    
+    # Configure logging
+    configure_logging(level=logging.DEBUG)
+    
+    logger = logging.getLogger("filavaga")
+    
+    # 1. Log a message
+    logger.info("Test info message")
+    
+    captured = capsys.readouterr()
+    
+    # Verify stdout is clean
+    assert captured.out == ""
+    
+    # Verify stderr contains JSON
+    err_lines = captured.err.strip().split("\n")
+    assert len(err_lines) >= 1
+    
+    log_record = json.loads(err_lines[-1])
+    assert "timestamp" in log_record
+    assert log_record["level"] == "INFO"
+    assert log_record["message"] == "Test info message"
+    
+    # 2. Log an exception
+    try:
+        raise ValueError("Simulated error")
+    except ValueError:
+        logger.exception("Something went wrong")
+        
+    captured_err = capsys.readouterr()
+    err_lines_exc = captured_err.err.strip().split("\n")
+    log_record_exc = json.loads(err_lines_exc[-1])
+    
+    assert log_record_exc["level"] == "ERROR"
+    assert log_record_exc["message"] == "Something went wrong"
+    assert "ValueError: Simulated error" in log_record_exc["exception"]
+
+
+

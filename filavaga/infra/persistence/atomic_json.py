@@ -11,8 +11,11 @@ import os
 import json
 import shutil
 import threading
+import logging
 from filavaga.application.ports.outbound import IStateRepository
 from filavaga.core.entities import Candidate, Vacancy, Queue
+
+logger = logging.getLogger("filavaga")
 
 
 class AtomicJsonRepository(IStateRepository):
@@ -69,9 +72,11 @@ class AtomicJsonRepository(IStateRepository):
     def _load_state_from_disk(self) -> None:
         """Read snapshot from disk and rebuild domain objects in memory."""
         if not os.path.exists(self._filepath):
+            logger.info("No existing snapshot found at %s. Initializing empty state.", self._filepath)
             return
 
         try:
+            logger.debug("Loading state snapshot from %s.", self._filepath)
             with open(self._filepath, "r", encoding="utf-8") as f:
                 data = json.load(f)
                 
@@ -105,17 +110,22 @@ class AtomicJsonRepository(IStateRepository):
                     profession_code=q_val["profession_code"],
                     candidate_ids=q_val.get("candidate_ids", [])
                 )
-        except Exception:
+            logger.info("Successfully loaded state snapshot from disk.")
+        except Exception as e:
             # Under resilient guidelines, if the active snapshot is corrupted,
             # we try to restore from .bak
+            logger.warning("Active snapshot file at %s is corrupted or unreadable. Error: %s. Attempting backup recovery.", self._filepath, e)
             bak_path = self._filepath + ".bak"
             if os.path.exists(bak_path):
                 # Swap and reload
                 try:
+                    logger.info("Restoring backup from %s.", bak_path)
                     shutil.copy2(bak_path, self._filepath)
                     self._load_state_from_disk()
-                except Exception:
-                    pass
+                except Exception as ex:
+                    logger.error("Failed to restore backup snapshot. Error: %s", ex)
+            else:
+                logger.error("No backup snapshot file found at %s.", bak_path)
 
     def _save_state_to_disk(self) -> None:
         """Serialize memory index structures and write atomically to disk."""
@@ -172,13 +182,20 @@ class AtomicJsonRepository(IStateRepository):
         tmp_path = self._filepath + ".tmp"
         bak_path = self._filepath + ".bak"
 
-        # 1. Write to temporary file first
-        with open(tmp_path, "w", encoding="utf-8") as f:
-            json.dump(payload, f, indent=2, ensure_ascii=False)
+        try:
+            logger.debug("Writing temporary snapshot state to %s.", tmp_path)
+            # 1. Write to temporary file first
+            with open(tmp_path, "w", encoding="utf-8") as f:
+                json.dump(payload, f, indent=2, ensure_ascii=False)
 
-        # 2. Backup the old active file if it exists
-        if os.path.exists(self._filepath):
-            shutil.copy2(self._filepath, bak_path)
+            # 2. Backup the old active file if it exists
+            if os.path.exists(self._filepath):
+                logger.debug("Backing up active snapshot file to %s.", bak_path)
+                shutil.copy2(self._filepath, bak_path)
 
-        # 3. Perform OS atomic replace (rename staging to active)
-        os.replace(tmp_path, self._filepath)
+            # 3. Perform OS atomic replace (rename staging to active)
+            os.replace(tmp_path, self._filepath)
+            logger.info("Successfully saved state snapshot atomically to %s.", self._filepath)
+        except Exception as e:
+            logger.error("Failed to save state snapshot to disk. Error: %s", e)
+            raise

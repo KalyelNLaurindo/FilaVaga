@@ -11,11 +11,11 @@ Set up structured JSON logging to `stderr`. System events, warnings, locks, and 
 
 ## ✅ Definition of Ready (DoR)
 
-* [ ] TDD Setup: Test file 'tests/test_infra.py' is ready
-* [ ] JSON telemetry logging format defined
+* [x] TDD Setup: Test file 'tests/test_infra.py' is ready
+* [x] JSON telemetry logging format defined
 
 ## 🏁 Definition of Done (DoD) & Acceptance Criteria
 
-* [ ] All logs route exclusively to stderr, leaving stdout clean for CLI/TUI outputs
-* [ ] Logs use valid JSON format with timestamp, log level, message, and error details
-* [ ] Logging calls are verified across critical use cases
+* [x] All logs route exclusively to stderr, leaving stdout clean for CLI/TUI outputs
+* [x] Logs use valid JSON format with timestamp, log level, message, and error details
+* [x] Logging calls are verified across critical use cases

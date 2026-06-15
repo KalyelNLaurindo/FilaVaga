@@ -13,12 +13,16 @@ from filavaga.application.services.queue_manager import QueueManager
 from filavaga.application.services.match_engine import MatchEngine
 from filavaga.infra.cli.command_router import ArgparseCLIAdapter
 from filavaga.infra.cli.presenter import RichConsolePresenter
+from filavaga.infra.logger import configure_logging
 
 
 def main():
     """
     Main entry point for bootstrapping the application.
     """
+    # 0. Configure structured logging to stderr
+    configure_logging()
+    
     # 1. Determine local snapshot persistence path
     home_dir = os.path.expanduser("~")
     db_path = os.path.join(home_dir, ".filavaga", "state_snapshot.json")

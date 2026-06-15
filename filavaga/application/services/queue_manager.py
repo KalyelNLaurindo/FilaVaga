@@ -7,10 +7,13 @@ Author: Kalyel N. Laurindo / Software Engineer
 """
 
 import uuid
+import logging
 from filavaga.application.ports.inbound import IRegisterCandidateUseCase
 from filavaga.application.ports.outbound import IClock, IStateRepository
 from filavaga.core.entities import Candidate, Queue
 from filavaga.core.exceptions import FilaVagaDomainError
+
+logger = logging.getLogger("filavaga")
 
 
 class QueueManager(IRegisterCandidateUseCase):
@@ -31,6 +34,7 @@ class QueueManager(IRegisterCandidateUseCase):
         Validate input parameters, create a Candidate, save to repository,
         and append to the chronological professional FIFO Queue.
         """
+        logger.info("Registering candidate '%s' for CBO '%s' in zone '%s'.", name, profession_code, sector_zone)
         if not name or not name.strip():
             raise FilaVagaDomainError("Candidate name cannot be empty.")
         if not profession_code or not profession_code.strip():
@@ -70,4 +74,5 @@ class QueueManager(IRegisterCandidateUseCase):
         # Save updated queue state
         self._repository.save_queue(queue)
 
+        logger.info("Successfully registered candidate '%s' (ID: %s) in FIFO queue.", candidate.name, candidate.id)
         return candidate

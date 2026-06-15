@@ -187,4 +187,43 @@ def test_vacancy_candidate_placement():
         vacancy_expired.place_candidate("c_4", "2026-06-16T12:00:00Z")
 
 
+def test_queue_creation_and_chronology():
+    """Verify that Queue aggregate enforces strict FIFO chronology sorting based on registered_at."""
+    from filavaga.core.entities import Queue, Candidate
+    from filavaga.core.exceptions import DuplicateCandidateError
+
+    # Initialize empty queue
+    queue = Queue(profession_code="4110-10")
+    assert queue.profession_code == "4110-10"
+    assert queue.candidate_ids == []
+
+    # Prepare candidate objects with different registration times
+    candidate_late = Candidate(
+        id="c_late", name="Maria Late", sector_zone="SUL",
+        profession_code="4110-10", registered_at="2026-06-15T10:00:00Z"
+    )
+    candidate_early = Candidate(
+        id="c_early", name="Joao Early", sector_zone="SUL",
+        profession_code="4110-10", registered_at="2026-06-15T09:00:00Z"
+    )
+
+    candidates_map = {
+        candidate_late.id: candidate_late,
+        candidate_early.id: candidate_early
+    }
+
+    # Add late candidate first, then early candidate
+    queue.add_candidate(candidate_late, candidates_map)
+    assert queue.candidate_ids == ["c_late"]
+
+    # When early is added, queue must sort chronologically
+    queue.add_candidate(candidate_early, candidates_map)
+    assert queue.candidate_ids == ["c_early", "c_late"]
+
+    # Try adding a duplicate candidate (should raise DuplicateCandidateError)
+    with pytest.raises(DuplicateCandidateError):
+        queue.add_candidate(candidate_early, candidates_map)
+
+
+
 

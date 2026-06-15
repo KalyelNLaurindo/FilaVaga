@@ -11,11 +11,11 @@ Design the `Queue` aggregate protecting FIFO (First-In, First-Out) array constra
 
 ## ✅ Definition of Ready (DoR)
 
-* [ ] TDD Setup: Test file 'tests/test_domain.py' is ready for Queue aggregate validation
-* [ ] Queue aggregate boundaries, state, and methods sketched out
+* [x] TDD Setup: Test file 'tests/test_domain.py' is ready for Queue aggregate validation
+* [x] Queue aggregate boundaries, state, and methods sketched out
 
 ## 🏁 Definition of Done (DoD) & Acceptance Criteria
 
-* [ ] Queue aggregate strictly guarantees FIFO ordering
-* [ ] Candidate duplicate insertion is prevented and raises a domain exception
-* [ ] All FIFO extraction and ordering unit tests pass
+* [x] Queue aggregate strictly guarantees FIFO ordering
+* [x] Candidate duplicate insertion is prevented and raises a domain exception
+* [x] All FIFO extraction and ordering unit tests pass

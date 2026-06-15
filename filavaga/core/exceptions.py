@@ -46,3 +46,11 @@ class EntityExpiredError(FilaVagaDomainError):
     Raised when attempting to interact with or match against an expired vacancy (TTL violation).
     """
     pass
+
+
+class DuplicateCandidateError(FilaVagaDomainError):
+    """
+    Raised when attempting to register a candidate that is already present in the queue.
+    """
+    pass
+

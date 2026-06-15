@@ -11,11 +11,11 @@ Implement the `ArgparseCLIAdapter` command router. Map CLI console arguments (e.
 
 ## ✅ Definition of Ready (DoR)
 
-* [ ] TDD Setup: Test file 'tests/test_infra.py' is ready
-* [ ] CLI command inputs, options, and expected arguments designed
+* [x] TDD Setup: Test file 'tests/test_infra.py' is ready
+* [x] CLI command inputs, options, and expected arguments designed
 
 ## 🏁 Definition of Done (DoD) & Acceptance Criteria
 
-* [ ] CLI router correctly parses command line arguments and routes execution
-* [ ] Provides helpful error messages and usage documentation under --help
-* [ ] Integration tests verify commands execute correctly using simulated sys.argv
+* [x] CLI router correctly parses command line arguments and routes execution
+* [x] Provides helpful error messages and usage documentation under --help
+* [x] Integration tests verify commands execute correctly using simulated sys.argv

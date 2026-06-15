@@ -106,3 +106,96 @@ def test_system_clock_override_and_mocking():
     assert clock_fixed.now() == fixed_time
     assert clock_fixed.now().isoformat() == "2026-06-15T12:00:00+00:00"
 
+
+def test_argparse_cli_adapter_register(tmp_path, capsys):
+    """Verify that ArgparseCLIAdapter routes register commands and prints output."""
+    from filavaga.infra.cli.command_router import ArgparseCLIAdapter
+    from filavaga.infra.persistence.atomic_json import AtomicJsonRepository
+    from filavaga.infra.persistence.system_clock import SystemClock
+    from filavaga.application.services.queue_manager import QueueManager
+    from datetime import datetime, timezone
+    
+    db_file = tmp_path / "state_snapshot.json"
+    repo = AtomicJsonRepository(str(db_file))
+    clock = SystemClock(override_time=datetime(2026, 6, 15, 12, 0, 0, tzinfo=timezone.utc))
+    manager = QueueManager(repo, clock)
+    
+    adapter = ArgparseCLIAdapter(register_usecase=manager, match_usecase=None)
+    
+    # Execute routing
+    adapter.run(["register", "--name", "Maria Silva", "--cbo", "4110-10", "--zone", "SUL"])
+    
+    captured = capsys.readouterr()
+    assert "Maria Silva" in captured.out
+    assert "4110-10" in captured.out
+    assert "SUL" in captured.out
+    
+    # Verify candidate actually exists in repository
+    all_candidates = repo.get_all_candidates()
+    assert len(all_candidates) == 1
+    candidate = list(all_candidates.values())[0]
+    assert candidate.name == "Maria Silva"
+    assert candidate.profession_code == "4110-10"
+    assert candidate.sector_zone == "SUL"
+
+
+def test_argparse_cli_adapter_match(tmp_path, capsys):
+    """Verify that ArgparseCLIAdapter routes match commands and prints output."""
+    from filavaga.infra.cli.command_router import ArgparseCLIAdapter
+    from filavaga.infra.persistence.atomic_json import AtomicJsonRepository
+    from filavaga.infra.persistence.system_clock import SystemClock
+    from filavaga.application.services.match_engine import MatchEngine
+    from filavaga.core.entities import Candidate, Vacancy, Queue
+    from datetime import datetime, timezone
+    
+    db_file = tmp_path / "state_snapshot.json"
+    repo = AtomicJsonRepository(str(db_file))
+    clock = SystemClock(override_time=datetime(2026, 6, 15, 12, 0, 0, tzinfo=timezone.utc))
+    engine = MatchEngine(repo, clock)
+    
+    # Setup state
+    vacancy = Vacancy(
+        id="v_01", title="Auxiliar", profession_code="4110-10",
+        sector_zone="SUL", capacity=2, created_at="2026-06-15T10:00:00Z",
+        expires_at="2026-06-16T10:00:00Z"
+    )
+    repo.save_vacancy(vacancy)
+    
+    c_a = Candidate(
+        id="c_a", name="Maria Silva", sector_zone="SUL",
+        profession_code="4110-10", registered_at="2026-06-15T08:00:00Z",
+        status="PENDING"
+    )
+    repo.save_candidate(c_a)
+    
+    queue = Queue(profession_code="4110-10", candidate_ids=["c_a"])
+    repo.save_queue(queue)
+    
+    adapter = ArgparseCLIAdapter(register_usecase=None, match_usecase=engine)
+    
+    # Execute routing
+    adapter.run(["match", "--id", "v_01"])
+    
+    captured = capsys.readouterr()
+    assert "Maria Silva" in captured.out
+    assert "v_01" in captured.out
+    
+    # Verify vacancy capacity updated
+    updated_vacancy = repo.get_vacancy("v_01")
+    assert updated_vacancy.placed_candidate_ids == ["c_a"]
+
+
+def test_argparse_cli_adapter_help(capsys):
+    """Verify that ArgparseCLIAdapter prints help when requested."""
+    from filavaga.infra.cli.command_router import ArgparseCLIAdapter
+    import pytest
+    
+    adapter = ArgparseCLIAdapter(None, None)
+    
+    with pytest.raises(SystemExit):
+        adapter.run(["--help"])
+        
+    captured = capsys.readouterr()
+    assert "register" in captured.out or "register" in captured.err
+    assert "match" in captured.out or "match" in captured.err
+

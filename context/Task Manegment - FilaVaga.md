@@ -118,7 +118,7 @@ Tasks are mapped bottom-up matching the hexagonal boundaries and dependencies.
   - _Metrics:_ Reach: 80 | Impact: 2.5 | Confidence: 0.9 | Effort: 2 (2 SP)
   - _RICE Score:_ 90.0
   - _TDD Test File:_ `tests/test_infra.py`
-  - _Status:_ To Do
+  - _Status:_ Done
 - [**TSK-13**](backlog/TSK-13.md)**: RichConsolePresenter TUI Rendering Engine**
   - _Epic/Requirement Link:_ NFR05 - Accessibility & UI Design System
   - _Metrics:_ Reach: 80 | Impact: 2.5 | Confidence: 0.8 | Effort: 2 (2 SP)
@@ -160,7 +160,6 @@ Tasks are mapped bottom-up matching the hexagonal boundaries and dependencies.
 
 ### **🔴 To Do (Ready for Development)**
 
-- [ ] [**TSK-12**](backlog/TSK-12.md)**:** Argparse Command Router & Controller Adapter (Est. 2 SP)
 - [ ] [**TSK-13**](backlog/TSK-13.md)**:** RichConsolePresenter TUI Rendering Engine (Est. 2 SP)
 - [ ] [**TSK-14**](backlog/TSK-14.md)**:** Standard Error Structured JSON Logging & Diagnostics (Est. 2 SP)
 - [ ] [**TSK-15**](backlog/TSK-15.md)**:** Self-Healing JSON Schema Validator & Backup Recovery (Est. 2 SP)
@@ -188,5 +187,6 @@ _None._
 - [x] [**TSK-09**](backlog/TSK-09.md)**:** MatchEngine Multi-Filter Matching Algorithm (3 SP)
 - [x] [**TSK-10**](backlog/TSK-10.md)**:** Thread-Safe Atomic JSON Persistence Engine (3 SP)
 - [x] [**TSK-11**](backlog/TSK-11.md)**:** SystemClock Adapter Implementation (1 SP)
+- [x] [**TSK-12**](backlog/TSK-12.md)**:** Argparse Command Router & Controller Adapter (2 SP)
 
 _Signed by:_ Kalyel N. Laurindo / Project Owner

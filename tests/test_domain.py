@@ -32,3 +32,24 @@ def test_exception_messages():
     with pytest.raises(EntityExpiredError) as exc_info:
         raise EntityExpiredError("Vacancy v_456 has expired")
     assert str(exc_info.value) == "Vacancy v_456 has expired"
+
+
+def test_candidate_creation():
+    """Verify that a Candidate entity can be successfully created with correct attributes."""
+    from filavaga.core.entities import Candidate
+
+    candidate = Candidate(
+        id="c_01h3nbd7z6r6e",
+        name="Maria Silva",
+        sector_zone="SUL",
+        profession_code="4110-10",
+        registered_at="2026-06-15T08:30:15Z"
+    )
+
+    assert candidate.id == "c_01h3nbd7z6r6e"
+    assert candidate.name == "Maria Silva"
+    assert candidate.sector_zone == "SUL"
+    assert candidate.profession_code == "4110-10"
+    assert candidate.registered_at == "2026-06-15T08:30:15Z"
+    assert candidate.status == "PENDING"
+

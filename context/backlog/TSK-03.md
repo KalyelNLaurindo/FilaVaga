@@ -11,11 +11,11 @@ Build the `Candidate` domain entity with absolute isolation and zero external de
 
 ## ✅ Definition of Ready (DoR)
 
-* [ ] TDD Setup: Test file 'tests/test_domain.py' is ready for adding Candidate unit tests
-* [ ] Properties, constraints, and types for Candidate entity defined
+* [x] TDD Setup: Test file 'tests/test_domain.py' is ready for adding Candidate unit tests
+* [x] Properties, constraints, and types for Candidate entity defined
 
 ## 🏁 Definition of Done (DoD) & Acceptance Criteria
 
-* [ ] Candidate entity behaves correctly as a pure Python OOP model
-* [ ] Type hints are strictly applied to all attributes and methods
-* [ ] All tests in 'tests/test_domain.py' targeting Candidate are green
+* [x] Candidate entity behaves correctly as a pure Python OOP model
+* [x] Type hints are strictly applied to all attributes and methods
+* [x] All tests in 'tests/test_domain.py' targeting Candidate are green

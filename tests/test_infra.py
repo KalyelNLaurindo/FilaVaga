@@ -199,3 +199,80 @@ def test_argparse_cli_adapter_help(capsys):
     assert "register" in captured.out or "register" in captured.err
     assert "match" in captured.out or "match" in captured.err
 
+
+def test_presenter_layouts():
+    """Verify that RichConsolePresenter renders candidate registration, matches, and errors correctly."""
+    from filavaga.infra.cli.presenter import RichConsolePresenter
+    from filavaga.core.entities import Candidate
+    from rich.console import Console
+    
+    console = Console(record=True, width=80)
+    presenter = RichConsolePresenter(console=console)
+    
+    # 1. Test candidate registration rendering
+    candidate = Candidate(
+        id="c_test", name="Maria Silva", sector_zone="SUL",
+        profession_code="4110-10", registered_at="2026-06-15T12:00:00+00:00"
+    )
+    presenter.display_candidate_registration(candidate)
+    output = console.export_text()
+    assert "Maria Silva" in output
+    assert "4110-10" in output
+    assert "SUL" in output
+    assert "PENDING" in output
+    
+    # 2. Test vacancy match rendering
+    presenter.display_vacancy_match(vacancy_id="v_01", candidate=candidate)
+    output = console.export_text()
+    assert "v_01" in output
+    assert "Maria Silva" in output
+    
+    # 3. Test no match rendering
+    presenter.display_no_match(vacancy_id="v_01")
+    output = console.export_text()
+    assert "v_01" in output
+    assert "No matching candidate" in output
+    
+    # 4. Test error rendering
+    presenter.display_error("Domain Error", "Candidate already exists")
+    output = console.export_text()
+    assert "Domain Error" in output
+    assert "Candidate already exists" in output
+
+
+def test_presenter_dashboard():
+    """Verify that RichConsolePresenter renders the dashboard table grid correctly."""
+    from filavaga.infra.cli.presenter import RichConsolePresenter
+    from filavaga.core.entities import Candidate, Vacancy, Queue
+    from rich.console import Console
+    
+    console = Console(record=True, width=80)
+    presenter = RichConsolePresenter(console=console)
+    
+    # Mock data indexes
+    candidates = {
+        "c_1": Candidate(
+            id="c_1", name="Maria Silva", sector_zone="SUL",
+            profession_code="4110-10", registered_at="2026-06-15T08:00:00Z"
+        )
+    }
+    vacancies = {
+        "v_1": Vacancy(
+            id="v_1", title="Auxiliar", profession_code="4110-10",
+            sector_zone="SUL", capacity=2, created_at="2026-06-15T10:00:00Z",
+            expires_at="2026-06-16T10:00:00Z"
+        )
+    }
+    queues = {
+        "4110-10": Queue(profession_code="4110-10", candidate_ids=["c_1"])
+    }
+    
+    presenter.display_dashboard(candidates, vacancies, queues)
+    output = console.export_text()
+    
+    assert "Maria Silva" in output
+    assert "4110-10" in output
+    assert "v_1" in output
+    assert "Auxiliar" in output
+
+

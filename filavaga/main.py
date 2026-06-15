@@ -12,6 +12,7 @@ from filavaga.infra.persistence.atomic_json import AtomicJsonRepository
 from filavaga.application.services.queue_manager import QueueManager
 from filavaga.application.services.match_engine import MatchEngine
 from filavaga.infra.cli.command_router import ArgparseCLIAdapter
+from filavaga.infra.cli.presenter import RichConsolePresenter
 
 
 def main():
@@ -25,6 +26,7 @@ def main():
     # 2. Instantiate Outbound Adapters
     clock = SystemClock()
     repository = AtomicJsonRepository(db_path)
+    presenter = RichConsolePresenter()
     
     # 3. Instantiate Core Services (Inbound Ports implementation)
     queue_manager = QueueManager(repository, clock)
@@ -33,7 +35,9 @@ def main():
     # 4. Instantiate CLI Adapter (Inbound controller) and run
     cli_adapter = ArgparseCLIAdapter(
         register_usecase=queue_manager,
-        match_usecase=match_engine
+        match_usecase=match_engine,
+        presenter=presenter,
+        repository=repository
     )
     cli_adapter.run()
 

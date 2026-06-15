@@ -9,7 +9,9 @@ Author: Kalyel N. Laurindo / Software Engineer
 import sys
 import argparse
 from filavaga.application.ports.inbound import IRegisterCandidateUseCase, IMatchVacancyUseCase
+from filavaga.application.ports.outbound import IStateRepository
 from filavaga.core.exceptions import FilaVagaDomainError
+from filavaga.infra.cli.presenter import RichConsolePresenter
 
 
 class ArgparseCLIAdapter:
@@ -23,12 +25,16 @@ class ArgparseCLIAdapter:
         self,
         register_usecase: IRegisterCandidateUseCase | None,
         match_usecase: IMatchVacancyUseCase | None,
+        presenter: RichConsolePresenter | None = None,
+        repository: IStateRepository | None = None,
     ):
         """
         Initialize the adapter with required inbound use cases.
         """
         self._register_usecase = register_usecase
         self._match_usecase = match_usecase
+        self._presenter = presenter or RichConsolePresenter()
+        self._repository = repository
 
     def run(self, args: list[str] | None = None) -> None:
         """
@@ -64,33 +70,44 @@ class ArgparseCLIAdapter:
                     profession_code=parsed_args.cbo,
                     sector_zone=parsed_args.zone,
                 )
-                print(f"Success: Candidate registered successfully.")
-                print(f"  ID: {candidate.id}")
-                print(f"  Name: {candidate.name}")
-                print(f"  CBO: {candidate.profession_code}")
-                print(f"  Zone: {candidate.sector_zone}")
-                print(f"  Status: {candidate.status}")
-                print(f"  Registered At: {candidate.registered_at}")
+                self._presenter.display_candidate_registration(candidate)
 
             elif parsed_args.command == "match":
                 if not self._match_usecase:
                     raise RuntimeError("Match usecase is not configured.")
                 candidate = self._match_usecase.match_vacancy(vacancy_id=parsed_args.id)
                 if candidate:
-                    print(f"Success: Vacancy matched successfully.")
-                    print(f"  Vacancy ID: {parsed_args.id}")
-                    print(f"  Matched Candidate ID: {candidate.id}")
-                    print(f"  Name: {candidate.name}")
-                    print(f"  Status: {candidate.status}")
+                    self._presenter.display_vacancy_match(parsed_args.id, candidate)
                 else:
-                    print(f"No matching candidate found for vacancy {parsed_args.id}.")
+                    self._presenter.display_no_match(parsed_args.id)
 
             elif parsed_args.command == "dashboard":
-                print("Interactive dashboard started...")
+                if not self._repository:
+                    raise RuntimeError("Repository is not configured for dashboard view.")
+                
+                candidates_map = self._repository.get_all_candidates()
+                vacancies_map = self._repository.get_all_vacancies()
+                
+                # Fetch all existing queues by retrieving all unique profession codes
+                cbo_codes = set()
+                cbo_codes.update(c.profession_code for c in candidates_map.values())
+                cbo_codes.update(v.profession_code for v in vacancies_map.values())
+                
+                queues_map = {}
+                for code in cbo_codes:
+                    q = self._repository.get_queue(code)
+                    if q:
+                        queues_map[code] = q
+                        
+                self._presenter.display_dashboard(
+                    candidates=candidates_map,
+                    vacancies=vacancies_map,
+                    queues=queues_map
+                )
 
         except FilaVagaDomainError as e:
-            print(f"Domain Error: {e}", file=sys.stderr)
+            self._presenter.display_error("Domain Error", str(e))
             sys.exit(1)
         except Exception as e:
-            print(f"System Error: {e}", file=sys.stderr)
+            self._presenter.display_error("System Error", str(e))
             sys.exit(1)

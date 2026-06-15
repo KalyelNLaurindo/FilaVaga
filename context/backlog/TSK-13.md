@@ -11,11 +11,11 @@ Implement the `RichConsolePresenter` using ANSI sequences or a lightweight prese
 
 ## ✅ Definition of Ready (DoR)
 
-* [ ] TDD Setup: Test file 'tests/test_infra.py' is ready
-* [ ] UI design specifications, tables, and colors mapped out
+* [x] TDD Setup: Test file 'tests/test_infra.py' is ready
+* [x] UI design specifications, tables, and colors mapped out
 
 ## 🏁 Definition of Done (DoD) & Acceptance Criteria
 
-* [ ] CLI outputs look highly readable, aesthetic, and aligned
-* [ ] Handles narrow/wide terminal resizing gracefully
-* [ ] Tested for standard console formatting outputs
+* [x] CLI outputs look highly readable, aesthetic, and aligned
+* [x] Handles narrow/wide terminal resizing gracefully
+* [x] Tested for standard console formatting outputs

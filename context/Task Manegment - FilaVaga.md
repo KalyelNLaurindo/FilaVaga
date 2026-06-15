@@ -66,7 +66,7 @@ Tasks are mapped bottom-up matching the hexagonal boundaries and dependencies.
   - *Metrics:* Reach: 85 | Impact: 3.0 | Confidence: 0.9 | Effort: 1 (1 SP)
   - *RICE Score:* 229.5
   - *TDD Test File:* `tests/test_domain.py`
-  - *Status:* To Do
+  - *Status:* Done
 - [**TSK-05**](https://gemini.google.com/app/tasks/TSK-05.md)**: Vacancy Domain Entity with Lazy-Evaluated TTL & Capacity**
   - *Epic/Requirement Link:* RF02 - Lazy TTL
   - *Metrics:* Reach: 85 | Impact: 3.0 | Confidence: 0.9 | Effort: 2 (2 SP)
@@ -162,7 +162,6 @@ Tasks are mapped bottom-up matching the hexagonal boundaries and dependencies.
 
 ### **🔴 To Do (Ready for Development)**
 
-- [ ] [**TSK-04**](https://gemini.google.com/app/tasks/TSK-04.md)**:** Candidate Status State Machine Transition Rules (Est. 1 SP)
 - [ ] [**TSK-05**](https://gemini.google.com/app/tasks/TSK-05.md)**:** Vacancy Domain Entity with Lazy-Evaluated TTL & Capacity (Est. 2 SP)
 - [ ] [**TSK-06**](https://gemini.google.com/app/tasks/TSK-06.md)**:** Queue Aggregate & Inbound Sequence Rules (Est. 2 SP)
 - [ ] [**TSK-07**](https://gemini.google.com/app/tasks/TSK-07.md)**:** Port Abstractions (Inbound & Outbound Interfaces) (Est. 1 SP)
@@ -190,5 +189,6 @@ Tasks are mapped bottom-up matching the hexagonal boundaries and dependencies.
 - [x] [**TSK-01**](https://gemini.google.com/app/tasks/TSK-01.md)**:** Configuration Validation & Directory Setup (1 SP)
 - [x] [**TSK-02**](https://gemini.google.com/app/tasks/TSK-02.md)**:** Custom Domain Exceptions & Error Mapping (1 SP)
 - [x] [**TSK-03**](https://gemini.google.com/app/tasks/TSK-03.md)**:** Candidate Domain Entity & Properties (1 SP)
+- [x] [**TSK-04**](https://gemini.google.com/app/tasks/TSK-04.md)**:** Candidate Status State Machine Transition Rules (1 SP)
 
 *Signed by:* Kalyel N. Laurindo / Project Owner

@@ -11,11 +11,11 @@ Implement state machine transition validation rules for a candidate's status. Tr
 
 ## ✅ Definition of Ready (DoR)
 
-* [ ] TDD Setup: Test file 'tests/test_domain.py' is ready for testing state transitions
-* [ ] Custom Domain Exceptions (TSK-02) and Candidate entity (TSK-03) are defined
+* [x] TDD Setup: Test file 'tests/test_domain.py' is ready for testing state transitions
+* [x] Custom Domain Exceptions (TSK-02) and Candidate entity (TSK-03) are defined
 
 ## 🏁 Definition of Done (DoD) & Acceptance Criteria
 
-* [ ] Candidate state mutation is encapsulated and validates target status before transition
-* [ ] Incorrect transitions throw DomainStateException
-* [ ] All state transition tests pass
+* [x] Candidate state mutation is encapsulated and validates target status before transition
+* [x] Incorrect transitions throw DomainStateException
+* [x] All state transition tests pass

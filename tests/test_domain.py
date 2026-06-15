@@ -53,3 +53,60 @@ def test_candidate_creation():
     assert candidate.registered_at == "2026-06-15T08:30:15Z"
     assert candidate.status == "PENDING"
 
+
+def test_candidate_state_transitions():
+    """Verify that Candidate status transitions follow the strict state machine rules."""
+    from filavaga.core.entities import Candidate
+    from filavaga.core.exceptions import InvalidStateTransitionError
+
+    candidate = Candidate(
+        id="c_01h3nbd7z6r6e",
+        name="Maria Silva",
+        sector_zone="SUL",
+        profession_code="4110-10",
+        registered_at="2026-06-15T08:30:15Z"
+    )
+
+    # 1. PENDING -> CONTACTED (Valid)
+    candidate.transition_to("CONTACTED")
+    assert candidate.status == "CONTACTED"
+
+    # 2. CONTACTED -> CONTACTED (Same status, Valid no-op)
+    candidate.transition_to("CONTACTED")
+    assert candidate.status == "CONTACTED"
+
+    # 3. CONTACTED -> PLACED (Valid)
+    candidate.transition_to("PLACED")
+    assert candidate.status == "PLACED"
+
+    # 4. PLACED -> PENDING (Invalid, backward transition)
+    with pytest.raises(InvalidStateTransitionError):
+        candidate.transition_to("PENDING")
+
+    # 5. Reset to PENDING for testing other paths
+    candidate_2 = Candidate(
+        id="c_01h3nbd7z6r6f",
+        name="João Silva",
+        sector_zone="SUL",
+        profession_code="4110-10",
+        registered_at="2026-06-15T08:30:15Z"
+    )
+
+    # 6. PENDING -> PLACED (Invalid, direct jump)
+    with pytest.raises(InvalidStateTransitionError):
+        candidate_2.transition_to("PLACED")
+
+    # 7. PENDING -> REJECTED (Invalid, direct jump)
+    with pytest.raises(InvalidStateTransitionError):
+        candidate_2.transition_to("REJECTED")
+
+    # 8. PENDING -> CONTACTED -> REJECTED (Valid)
+    candidate_2.transition_to("CONTACTED")
+    candidate_2.transition_to("REJECTED")
+    assert candidate_2.status == "REJECTED"
+
+    # 9. REJECTED -> CONTACTED (Invalid, backward transition)
+    with pytest.raises(InvalidStateTransitionError):
+        candidate_2.transition_to("CONTACTED")
+
+

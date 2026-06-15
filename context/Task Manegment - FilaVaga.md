@@ -87,7 +87,7 @@ Tasks are mapped bottom-up matching the hexagonal boundaries and dependencies.
   - *Metrics:* Reach: 95 | Impact: 3.0 | Confidence: 1.0 | Effort: 1 (1 SP)
   - *RICE Score:* 285.0
   - *TDD Test File:* `tests/test_usecases.py`
-  - *Status:* To Do
+  - *Status:* Done
 - [**TSK-08**](https://gemini.google.com/app/tasks/TSK-08.md)**: QueueManager Application Service Execution Logic**
   - *Epic/Requirement Link:* RF01 - Candidate registration & state management
   - *Metrics:* Reach: 95 | Impact: 3.0 | Confidence: 0.8 | Effort: 2 (2 SP)
@@ -162,7 +162,6 @@ Tasks are mapped bottom-up matching the hexagonal boundaries and dependencies.
 
 ### **🔴 To Do (Ready for Development)**
 
-- [ ] [**TSK-07**](https://gemini.google.com/app/tasks/TSK-07.md)**:** Port Abstractions (Inbound & Outbound Interfaces) (Est. 1 SP)
 - [ ] [**TSK-08**](https://gemini.google.com/app/tasks/TSK-08.md)**:** QueueManager Application Service Execution Logic (Est. 2 SP)
 - [ ] [**TSK-09**](https://gemini.google.com/app/tasks/TSK-09.md)**:** MatchEngine Multi-Filter Matching Algorithm (Est. 3 SP)
 - [ ] [**TSK-10**](https://gemini.google.com/app/tasks/TSK-10.md)**:** Thread-Safe Atomic JSON Persistence Engine (Est. 3 SP)
@@ -190,5 +189,6 @@ Tasks are mapped bottom-up matching the hexagonal boundaries and dependencies.
 - [x] [**TSK-04**](https://gemini.google.com/app/tasks/TSK-04.md)**:** Candidate Status State Machine Transition Rules (1 SP)
 - [x] [**TSK-05**](https://gemini.google.com/app/tasks/TSK-05.md)**:** Vacancy Domain Entity with Lazy-Evaluated TTL & Capacity (2 SP)
 - [x] [**TSK-06**](https://gemini.google.com/app/tasks/TSK-06.md)**:** Queue Aggregate & Inbound Sequence Rules (2 SP)
+- [x] [**TSK-07**](https://gemini.google.com/app/tasks/TSK-07.md)**:** Port Abstractions (Inbound & Outbound Interfaces) (1 SP)
 
 *Signed by:* Kalyel N. Laurindo / Project Owner

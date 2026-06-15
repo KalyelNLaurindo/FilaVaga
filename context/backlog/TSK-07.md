@@ -11,11 +11,11 @@ Implement Clean Architecture Port interfaces. Design inbound ports (`IRegisterCa
 
 ## ✅ Definition of Ready (DoR)
 
-* [ ] TDD Setup: Test file 'tests/test_usecases.py' is ready
-* [ ] Contracts and interfaces mapped out for clean separation
+* [x] TDD Setup: Test file 'tests/test_usecases.py' is ready
+* [x] Contracts and interfaces mapped out for clean separation
 
 ## 🏁 Definition of Done (DoD) & Acceptance Criteria
 
-* [ ] Interfaces are defined as Python Abstract Base Classes (ABCs) with abstract methods
-* [ ] Domain and application services import only interfaces, not concrete adapters
-* [ ] Type hints match the defined contracts perfectly
+* [x] Interfaces are defined as Python Abstract Base Classes (ABCs) with abstract methods
+* [x] Domain and application services import only interfaces, not concrete adapters
+* [x] Type hints match the defined contracts perfectly

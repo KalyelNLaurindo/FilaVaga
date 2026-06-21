@@ -482,6 +482,12 @@ filavaga-cli/
 - **Decision:** Apply Lazy Evaluation pattern for vacancy TTL checks at execution query time.
 - **Rationale:** Vacancies are assessed and invalidated dynamically when matched against candidates, ensuring zero background processor consumption.
 
+### **ADR-004 (State Mutability and Abstraction Leak Prevention): Deep Copies on Repository Operations**
+
+- **Context:** `AtomicJsonRepository` maintains internal in-memory collections of domain models. If read methods (`get_candidate`, etc.) return direct references or shallow copies to these mutable models, the application layer can mutate their states directly. This bypasses the repository's `.save_*()` methods, causing in-memory state drift that is never serialized to disk and violates repository encapsulation.
+- **Decision:** Perform deep copies (`copy.deepcopy`) on all domain objects returned by query/read methods (`get_candidate`, `get_all_candidates`, `get_vacancy`, `get_all_vacancies`, `get_queue`) and on all objects passed to mutation/write methods (`save_candidate`, `save_vacancy`, `save_queue`) before caching them.
+- **Rationale:** Deep copying guarantees that the internal repository state cannot be mutated from the outside, enforcing a strict boundary between application runtime mutations and the persistence engine. It preserves encapsulation without requiring heavy refactoring of existing domain entities.
+
 ## **🏛️ 14. Code Governance & Naming Standards**
 
 ### **✍️ Code Governance Form Entry**

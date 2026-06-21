@@ -154,6 +154,13 @@ Tasks are mapped bottom-up matching the hexagonal boundaries and dependencies.
   - _TDD Test File:_ `tests/test_infra.py`
   - _Status:_ To Do
 
+- [**TSK-27**](backlog/TSK-27.md)**: Repository Reference Leak & Mutability Protection**
+  - _Epic/Requirement Link:_ NFR04 / Data Integrity / State Consistency
+  - _Metrics:_ Reach: 100 | Impact: 3.0 | Confidence: 1.0 | Effort: 1 (1 SP)
+  - _RICE Score:_ 300.0 (High Priority Compliance)
+  - _TDD Test File:_ `tests/test_infra.py`
+  - _Status:_ To Do
+
 
 ### **📦 Backlog Phase 6: Packaging & CI/CD Release**
 
@@ -227,6 +234,7 @@ Tasks are mapped bottom-up matching the hexagonal boundaries and dependencies.
 - [ ] [**TSK-20**](backlog/TSK-20.md)**:** Interactive Configuration Wizard (2 SP)
 - [ ] [**TSK-21**](backlog/TSK-21.md)**:** Anonymized Placement Analytics Export (2 SP)
 - [ ] [**TSK-26**](backlog/TSK-26.md)**:** File-System Access Permission Hardening (1 SP)
+- [ ] [**TSK-27**](backlog/TSK-27.md)**:** Repository Reference Leak & Mutability Protection (1 SP)
 
 
 **Phase 8 — Integração & Extensibilidade da Plataforma**

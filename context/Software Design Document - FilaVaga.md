@@ -391,6 +391,17 @@ Displayed when an invalid execution argument is provided or explicitly requested
 
   Automatically measures system terminal width via `os.get_terminal_size()`. If width is $<80$ characters, detailed candidate metadata arrays collapse into a vertical list to prevent horizontal wrapping and terminal line corruption.
 
+### **8.4. Multi-Language i18n Architecture**
+
+To support non-English or localized SINE environments, FilaVaga abstracts all UI labels, headers, and logs from execution logic:
+- **Translation Resource Files (`locales/*.json`):** Independent dictionary files mapped for `pt` (Portuguese), `en` (English), `fr` (French), `es` (Spanish), and `de` (German).
+- **Locale Resolution Precedence:**
+  1. CLI parameter override (e.g. `--lang fr`).
+  2. Configuration profile setting loaded from `config.json` (`"lang": "es"`).
+  3. Workstation host environment variable mapping (`LANG` or `LC_ALL`).
+  4. Default system fallback (`pt`).
+- **Interactive Hotkeys:** Allows layperson dynamic switching at runtime in the active shell using single-character commands.
+
 ## **📈 9. Observability & System Monitoring**
 
 - **Field 9.1 - Logging Aggregator Strategy:**

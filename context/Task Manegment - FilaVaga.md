@@ -161,6 +161,27 @@ Tasks are mapped bottom-up matching the hexagonal boundaries and dependencies.
   - _TDD Test File:_ `tests/test_infra.py`
   - _Status:_ To Do
 
+- [**TSK-28**](backlog/TSK-28.md)**: i18n Translation Engine & Language Configuration Loader**
+  - _Epic/Requirement Link:_ NFR05 / ACCESSIBILITY & DX
+  - _Metrics:_ Reach: 90 | Impact: 2.0 | Confidence: 0.8 | Effort: 2 (2 SP)
+  - _RICE Score:_ 72.0
+  - _TDD Test File:_ `tests/test_infra.py`
+  - _Status:_ To Do
+
+- [**TSK-29**](backlog/TSK-29.md)**: UI RichConsolePresenter Key-based Translation Mapping**
+  - _Epic/Requirement Link:_ NFR05 / ACCESSIBILITY & DX
+  - _Metrics:_ Reach: 90 | Impact: 2.0 | Confidence: 0.8 | Effort: 2 (2 SP)
+  - _RICE Score:_ 72.0
+  - _TDD Test File:_ `tests/test_infra.py`
+  - _Status:_ To Do
+
+- [**TSK-30**](backlog/TSK-30.md)**: Interactive Shortcuts & Layperson Menu Enhancements**
+  - _Epic/Requirement Link:_ NFR05 / ACCESSIBILITY & UX
+  - _Metrics:_ Reach: 95 | Impact: 2.5 | Confidence: 0.9 | Effort: 1 (1 SP)
+  - _RICE Score:_ 213.75
+  - _TDD Test File:_ `tests/test_infra.py`
+  - _Status:_ To Do
+
 
 ### **📦 Backlog Phase 6: Packaging & CI/CD Release**
 
@@ -235,6 +256,9 @@ Tasks are mapped bottom-up matching the hexagonal boundaries and dependencies.
 - [ ] [**TSK-21**](backlog/TSK-21.md)**:** Anonymized Placement Analytics Export (2 SP)
 - [ ] [**TSK-26**](backlog/TSK-26.md)**:** File-System Access Permission Hardening (1 SP)
 - [ ] [**TSK-27**](backlog/TSK-27.md)**:** Repository Reference Leak & Mutability Protection (1 SP)
+- [ ] [**TSK-28**](backlog/TSK-28.md)**:** i18n Translation Engine & Language Configuration Loader (2 SP)
+- [ ] [**TSK-29**](backlog/TSK-29.md)**:** UI RichConsolePresenter Key-based Translation Mapping (2 SP)
+- [ ] [**TSK-30**](backlog/TSK-30.md)**:** Interactive Shortcuts & Layperson Menu Enhancements (1 SP)
 
 
 **Phase 8 — Integração & Extensibilidade da Plataforma**

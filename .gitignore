@@ -16,4 +16,3 @@ logs/*.log
 # AI assistant context files (not for version control)
 context/CLAUDE*.md
 context/GEMINI*.md
-context/

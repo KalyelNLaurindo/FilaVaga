@@ -170,6 +170,13 @@ Tasks are mapped bottom-up matching the hexagonal boundaries and dependencies.
   - _TDD Test File:_ `tests/test_infra.py`
   - _Status:_ To Do
 
+- [**TSK-33**](backlog/TSK-33.md)**: Refactor Queue Aggregate for DDD Orthodox Self-Sufficiency**
+  - _Epic/Requirement Link:_ RF01 / Domain Modeling
+  - _Metrics:_ Reach: 95 | Impact: 3.0 | Confidence: 1.0 | Effort: 1 (1 SP)
+  - _RICE Score:_ 285.0
+  - _TDD Test File:_ `tests/test_domain.py`
+  - _Status:_ To Do
+
 ### **🌐 Backlog Phase 5.2: Internationalization (i18n) & Localized UI**
 
 - [**TSK-28**](backlog/TSK-28.md)**: i18n Translation Engine & Language Configuration Loader**
@@ -281,6 +288,7 @@ Tasks are mapped bottom-up matching the hexagonal boundaries and dependencies.
 - [ ] [**TSK-30**](backlog/TSK-30.md)**:** Interactive Shortcuts & Layperson Menu Enhancements (1 SP)
 - [ ] [**TSK-31**](backlog/TSK-31.md)**:** CLI Accessibility Suite (Support for --no-color and Screen-Reader Linearization) (1 SP)
 - [ ] [**TSK-32**](backlog/TSK-32.md)**:** Implement Unit of Work (UoW) Pattern for Multi-Repository Atomic Transactions (2 SP)
+- [ ] [**TSK-33**](backlog/TSK-33.md)**:** Refactor Queue Aggregate for DDD Orthodox Self-Sufficiency (1 SP)
 
 
 **Phase 8 — Integração & Extensibilidade da Plataforma**

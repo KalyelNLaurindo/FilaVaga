@@ -505,6 +505,12 @@ filavaga-cli/
 - **Decision:** Introduce a Unit of Work (`IUnitOfWork`) pattern using Python context managers. All database modifications are staged in-memory within the `with` block and committed atomically to disk as a single transaction upon successful exit. Any exception raised inside the block triggers a rollback of the in-memory cache to prevent dirty states.
 - **Rationale:** Guarantees transactional atomic execution (ACID properties) in a local flat-file storage environment without database server overhead.
 
+### **ADR-006 (Aggregate Self-Sufficiency & Domain Encapsulation of Queue Invariants): self-contained Queue sorting via QueueEntry value objects**
+
+- **Context:** Currently, `Queue.add_candidate()` requires an injected parameter `candidates_map: dict[str, Candidate]` to access candidate registration timestamps and sort candidate IDs chronologically. This violates aggregate boundary isolation and creates high coupling by injecting repository-like collections into the domain aggregate root.
+- **Decision:** Remodel the relationship so that `Queue` maintains its chronological FIFO ordering invariants internally. Instead of storing raw string IDs, `Queue` will store a list of `QueueEntry` Value Objects, where each `QueueEntry` contains both the `candidate_id` and the `registered_at` timestamp. The `add_candidate` method signature will be refactored to `add_candidate(candidate_id: str, registered_at: str)`.
+- **Rationale:** By wrapping the required sorting data in a local Value Object (`QueueEntry`), the `Queue` aggregate root remains self-sufficient and fully protects its internal ordering invariants. It respects the DDD rule of reference-by-ID for cross-aggregate associations (since `Candidate` and `Queue` are distinct aggregate roots) while completely eliminating external parameters/map injection, ensuring clean domain boundaries and loose coupling.
+
 ## **🏛️ 14. Code Governance & Naming Standards**
 
 ### **✍️ Code Governance Form Entry**

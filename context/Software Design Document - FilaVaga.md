@@ -499,6 +499,12 @@ filavaga-cli/
 - **Decision:** Perform deep copies (`copy.deepcopy`) on all domain objects returned by query/read methods (`get_candidate`, `get_all_candidates`, `get_vacancy`, `get_all_vacancies`, `get_queue`) and on all objects passed to mutation/write methods (`save_candidate`, `save_vacancy`, `save_queue`) before caching them.
 - **Rationale:** Deep copying guarantees that the internal repository state cannot be mutated from the outside, enforcing a strict boundary between application runtime mutations and the persistence engine. It preserves encapsulation without requiring heavy refactoring of existing domain entities.
 
+### **ADR-005 (Transactional Consistency & Unit of Work Pattern): context manager commit orchestration**
+
+- **Context:** Sequential writes to multiple independent entities (e.g. saving a candidate status update and then saving the queue aggregate state) in the application layer can result in a "split-brain" database state if a crash or error occurs mid-way.
+- **Decision:** Introduce a Unit of Work (`IUnitOfWork`) pattern using Python context managers. All database modifications are staged in-memory within the `with` block and committed atomically to disk as a single transaction upon successful exit. Any exception raised inside the block triggers a rollback of the in-memory cache to prevent dirty states.
+- **Rationale:** Guarantees transactional atomic execution (ACID properties) in a local flat-file storage environment without database server overhead.
+
 ## **🏛️ 14. Code Governance & Naming Standards**
 
 ### **✍️ Code Governance Form Entry**

@@ -147,6 +147,14 @@ Tasks are mapped bottom-up matching the hexagonal boundaries and dependencies.
   - _TDD Test File:_ `tests/test_infra.py`
   - _Status:_ Done
 
+- [**TSK-26**](backlog/TSK-26.md)**: File-System Access Permission Hardening**
+  - _Epic/Requirement Link:_ NFR03 / SECURITY
+  - _Metrics:_ Reach: 90 | Impact: 2.5 | Confidence: 0.9 | Effort: 1 (1 SP)
+  - _RICE Score:_ 202.5
+  - _TDD Test File:_ `tests/test_infra.py`
+  - _Status:_ To Do
+
+
 ### **📦 Backlog Phase 6: Packaging & CI/CD Release**
 
 - [**TSK-17**](backlog/TSK-17.md)**: PyProject Configuration & PyInstaller Standalone Compilation**
@@ -218,6 +226,8 @@ Tasks are mapped bottom-up matching the hexagonal boundaries and dependencies.
 - [ ] [**TSK-19**](backlog/TSK-19.md)**:** Historical Archiving & Snapshot Optimization (2 SP)
 - [ ] [**TSK-20**](backlog/TSK-20.md)**:** Interactive Configuration Wizard (2 SP)
 - [ ] [**TSK-21**](backlog/TSK-21.md)**:** Anonymized Placement Analytics Export (2 SP)
+- [ ] [**TSK-26**](backlog/TSK-26.md)**:** File-System Access Permission Hardening (1 SP)
+
 
 **Phase 8 — Integração & Extensibilidade da Plataforma**
 - [ ] [**TSK-22**](backlog/TSK-22.md)**:** REST-like In-Process Event Bus (4 SP)

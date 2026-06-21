@@ -112,9 +112,9 @@ FilaVaga enforces strict architectural separation boundaries through the **Hexag
 ### **✍️ Security Specification Form**
 
 - **Field 3.1 - Data In Transit Protocol:** Local In-Memory Communication (Zero-network execution; data never traverses a local or public network card).
-- **Field 3.2 - Data At Rest Encryption Standard:** Local Directory Lock (Relies on OS ACLs. The state snapshot is kept in the user’s protected home directory: `%USERPROFILE%\.filavaga\` on Windows or `~/.filavaga/` on Linux).
+- **Field 3.2 - Data At Rest Encryption Standard:** Delegated to Operating System Level Encryption (LUKS/BitLocker). Application restricts file permissions on the storage directories and JSON database files (e.g., `0700` for directories and `0600` for files on POSIX, and restricted DACLs on Windows) to prevent local user traversal.
 - **Field 3.3 - Password & Key Derivation Function:** N/A (FilaVaga is a local utility execution system with no shared credentials. It executes under the existing host OS session authority).
-- **Field 3.4 - Access Delegation Protocol:** CLI Permission Guards (Validates read/write authorization using local file descriptor security attributes before processing commands).
+- **Field 3.4 - Access Delegation Protocol:** OS-Level Access Control Lists & Permission Guards (Restricts read/write permissions at snapshot file creation so only the owning OS user has read/write privileges).
 - **Field 3.5 - Emergency Recovery Policy:** If state data corruption occurs, FilaVaga keeps the previous valid session snapshot under `state_snapshot.json.bak`. During initialization, a schema integrity check validates the active file; if corrupted, it auto-restores the backup and displays a warning to `stderr`.
 
 ## **🧩 4. Evolutionary Blueprint (Scaling Path)**

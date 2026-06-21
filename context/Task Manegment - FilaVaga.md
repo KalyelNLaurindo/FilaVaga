@@ -154,12 +154,16 @@ Tasks are mapped bottom-up matching the hexagonal boundaries and dependencies.
   - _TDD Test File:_ `tests/test_infra.py`
   - _Status:_ To Do
 
+### **🔒 Backlog Phase 5.1: Security Hardening & Encapsulation**
+
 - [**TSK-27**](backlog/TSK-27.md)**: Repository Reference Leak & Mutability Protection**
   - _Epic/Requirement Link:_ NFR04 / Data Integrity / State Consistency
   - _Metrics:_ Reach: 100 | Impact: 3.0 | Confidence: 1.0 | Effort: 1 (1 SP)
   - _RICE Score:_ 300.0 (High Priority Compliance)
   - _TDD Test File:_ `tests/test_infra.py`
   - _Status:_ To Do
+
+### **🌐 Backlog Phase 5.2: Internationalization (i18n) & Localized UI**
 
 - [**TSK-28**](backlog/TSK-28.md)**: i18n Translation Engine & Language Configuration Loader**
   - _Epic/Requirement Link:_ NFR05 / ACCESSIBILITY & DX
@@ -175,10 +179,19 @@ Tasks are mapped bottom-up matching the hexagonal boundaries and dependencies.
   - _TDD Test File:_ `tests/test_infra.py`
   - _Status:_ To Do
 
+### **🎨 Backlog Phase 5.3: Console Accessibility & Interactive UX**
+
 - [**TSK-30**](backlog/TSK-30.md)**: Interactive Shortcuts & Layperson Menu Enhancements**
   - _Epic/Requirement Link:_ NFR05 / ACCESSIBILITY & UX
   - _Metrics:_ Reach: 95 | Impact: 2.5 | Confidence: 0.9 | Effort: 1 (1 SP)
   - _RICE Score:_ 213.75
+  - _TDD Test File:_ `tests/test_infra.py`
+  - _Status:_ To Do
+
+- [**TSK-31**](backlog/TSK-31.md)**: CLI Accessibility Suite (Support for --no-color and Screen-Reader Linearization)**
+  - _Epic/Requirement Link:_ NFR05 / ACCESSIBILITY
+  - _Metrics:_ Reach: 95 | Impact: 3.0 | Confidence: 1.0 | Effort: 1 (1 SP)
+  - _RICE Score:_ 285.0
   - _TDD Test File:_ `tests/test_infra.py`
   - _Status:_ To Do
 
@@ -259,6 +272,7 @@ Tasks are mapped bottom-up matching the hexagonal boundaries and dependencies.
 - [ ] [**TSK-28**](backlog/TSK-28.md)**:** i18n Translation Engine & Language Configuration Loader (2 SP)
 - [ ] [**TSK-29**](backlog/TSK-29.md)**:** UI RichConsolePresenter Key-based Translation Mapping (2 SP)
 - [ ] [**TSK-30**](backlog/TSK-30.md)**:** Interactive Shortcuts & Layperson Menu Enhancements (1 SP)
+- [ ] [**TSK-31**](backlog/TSK-31.md)**:** CLI Accessibility Suite (Support for --no-color and Screen-Reader Linearization) (1 SP)
 
 
 **Phase 8 — Integração & Extensibilidade da Plataforma**

@@ -231,7 +231,16 @@ Ensure your modifications pass the repository quality gates before submitting a 
   flake8 filavaga/
   ```
 
+## 7. 🚀 Planned Roadmap: HTTP REST API Backend
+
+As detailed in task [TSK-34](context/backlog/TSK-34.md), we are planning to integrate a lightweight REST API server (using FastAPI) to expose the core matching engine and candidate queues over HTTP. This will allow FilaVaga to be run as an active backend service:
+* `POST /candidates` - Register a candidate.
+* `POST /vacancies` - Register a vacancy.
+* `POST /queues/fill` - Attempt to match and place a candidate.
+* `GET /queues/status` - Live status of all profession queues.
+
 ---
+
 
 🏁 **End of Document:** This repository README serves as the definitive engineering portal for the **FilaVaga** ecosystem. Changes to stack versions, core patterns, or installation requirements must follow official pull-request governance.
 

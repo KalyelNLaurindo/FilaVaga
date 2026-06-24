@@ -292,6 +292,8 @@ Tasks are mapped bottom-up matching the hexagonal boundaries and dependencies.
 - [ ] [**TSK-23**](backlog/TSK-23.md)**:** Vacancy Capacity Overflow Alerting (1 SP)
 - [ ] [**TSK-24**](backlog/TSK-24.md)**:** Candidate Profile Schema Validator (2 SP)
 - [ ] [**TSK-25**](backlog/TSK-25.md)**:** Queue Snapshot Serializer & Replay (4 SP)
+- [ ] [**TSK-34**](backlog/TSK-34.md)**:** HTTP REST API Backend Server Integration (3 SP)
+
 
 
 ### **🟡 In Progress (Actively Being Built)**

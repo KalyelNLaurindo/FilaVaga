@@ -29,7 +29,7 @@ class AtomicJsonRepository(IStateRepository):
 
     def __init__(self, filepath: str):
         self._filepath = os.path.abspath(filepath)
-        self._lock = threading.Lock()
+        self._lock = threading.RLock()
         self._candidates = {}
         self._vacancies = {}
         self._queues = {}

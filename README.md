@@ -114,7 +114,7 @@ FilaVaga relies on a streamlined, zero-dependency local footprint to bypass admi
 ## **📂 5. Codebase Structure & Directory Standards**
 
 ```text
-filavaga-cli/
+FilaVaga/
 ├── pyproject.toml              # Build specifications, dependencies & tool rules
 ├── config.json                 # JSON local workspace rules & business TTL limits
 ├── logs/                       # Local directory for logging exports
@@ -137,6 +137,7 @@ filavaga-cli/
 │   │
 │   ├── infra/                  # Infrastructure Adapter Layer (Concrete Drivers)
 │   │   ├── __init__.py
+│   │   ├── logger.py           # Structured JSON logging configurations
 │   │   ├── cli/                # Terminal CLI UI Adapters (Argparse, Presenter)
 │   │   │   ├── command_router.py
 │   │   │   └── presenter.py

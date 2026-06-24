@@ -2,7 +2,7 @@ import os
 import pytest
 import threading
 import json
-from filavaga.core.entities import Candidate, Vacancy, Queue
+from filavaga.core.entities import Candidate, Vacancy, Queue, QueueEntry
 
 def test_atomic_json_repository_crud(tmp_path):
     """Verify that AtomicJsonRepository can save and retrieve candidates, vacancies and queues correctly."""
@@ -33,7 +33,7 @@ def test_atomic_json_repository_crud(tmp_path):
     assert repo.get_all_vacancies() == {"v_1": vacancy}
 
     # 3. Queue CRUD
-    queue = Queue(profession_code="4110-10", candidate_ids=["c_1"])
+    queue = Queue(profession_code="4110-10", entries=[QueueEntry(candidate_id="c_1", registered_at="2026-06-15T08:00:00Z")])
     repo.save_queue(queue)
     assert repo.get_queue("4110-10") == queue
     assert repo.get_queue("7152-10") is None
@@ -110,7 +110,7 @@ def test_system_clock_override_and_mocking():
 def test_argparse_cli_adapter_register(tmp_path, capsys):
     """Verify that ArgparseCLIAdapter routes register commands and prints output."""
     from filavaga.infra.cli.command_router import ArgparseCLIAdapter
-    from filavaga.infra.persistence.atomic_json import AtomicJsonRepository
+    from filavaga.infra.persistence.atomic_json import AtomicJsonRepository, JsonUnitOfWork
     from filavaga.infra.persistence.system_clock import SystemClock
     from filavaga.application.services.queue_manager import QueueManager
     from datetime import datetime, timezone
@@ -118,7 +118,7 @@ def test_argparse_cli_adapter_register(tmp_path, capsys):
     db_file = tmp_path / "state_snapshot.json"
     repo = AtomicJsonRepository(str(db_file))
     clock = SystemClock(override_time=datetime(2026, 6, 15, 12, 0, 0, tzinfo=timezone.utc))
-    manager = QueueManager(repo, clock)
+    manager = QueueManager(JsonUnitOfWork(repo), clock)
     
     adapter = ArgparseCLIAdapter(register_usecase=manager, match_usecase=None)
     
@@ -142,7 +142,7 @@ def test_argparse_cli_adapter_register(tmp_path, capsys):
 def test_argparse_cli_adapter_match(tmp_path, capsys):
     """Verify that ArgparseCLIAdapter routes match commands and prints output."""
     from filavaga.infra.cli.command_router import ArgparseCLIAdapter
-    from filavaga.infra.persistence.atomic_json import AtomicJsonRepository
+    from filavaga.infra.persistence.atomic_json import AtomicJsonRepository, JsonUnitOfWork
     from filavaga.infra.persistence.system_clock import SystemClock
     from filavaga.application.services.match_engine import MatchEngine
     from filavaga.core.entities import Candidate, Vacancy, Queue
@@ -151,7 +151,7 @@ def test_argparse_cli_adapter_match(tmp_path, capsys):
     db_file = tmp_path / "state_snapshot.json"
     repo = AtomicJsonRepository(str(db_file))
     clock = SystemClock(override_time=datetime(2026, 6, 15, 12, 0, 0, tzinfo=timezone.utc))
-    engine = MatchEngine(repo, clock)
+    engine = MatchEngine(JsonUnitOfWork(repo), clock)
     
     # Setup state
     vacancy = Vacancy(
@@ -168,7 +168,7 @@ def test_argparse_cli_adapter_match(tmp_path, capsys):
     )
     repo.save_candidate(c_a)
     
-    queue = Queue(profession_code="4110-10", candidate_ids=["c_a"])
+    queue = Queue(profession_code="4110-10", entries=[QueueEntry(candidate_id="c_a", registered_at="2026-06-15T08:00:00Z")])
     repo.save_queue(queue)
     
     adapter = ArgparseCLIAdapter(register_usecase=None, match_usecase=engine)
@@ -264,7 +264,7 @@ def test_presenter_dashboard():
         )
     }
     queues = {
-        "4110-10": Queue(profession_code="4110-10", candidate_ids=["c_1"])
+        "4110-10": Queue(profession_code="4110-10", entries=[QueueEntry(candidate_id="c_1", registered_at="2026-06-15T08:00:00Z")])
     }
     
     presenter.display_dashboard(candidates, vacancies, queues)
@@ -581,15 +581,15 @@ def test_atomic_json_repository_mutability_protection(tmp_path):
     assert repo.get_vacancy("v_1").capacity == 5
     
     # 5. Test Queue Mutability Protection (Read & Write Isolation)
-    queue = Queue(profession_code="4110-10", candidate_ids=["c_1"])
+    queue = Queue(profession_code="4110-10", entries=[QueueEntry(candidate_id="c_1", registered_at="2026-06-15T08:00:00Z")])
     repo.save_queue(queue)
     retrieved_queue = repo.get_queue("4110-10")
-    retrieved_queue.candidate_ids.append("c_2")
+    retrieved_queue.entries.append(QueueEntry(candidate_id="c_2", registered_at="2026-06-15T08:30:00Z"))
     assert repo.get_queue("4110-10").candidate_ids == ["c_1"]
     
-    queue.candidate_ids.append("c_3")
+    queue.add_candidate("c_3", "2026-06-15T09:00:00Z")
     repo.save_queue(queue)
-    queue.candidate_ids.append("c_4")
+    queue.add_candidate("c_4", "2026-06-15T10:00:00Z")
     assert repo.get_queue("4110-10").candidate_ids == ["c_1", "c_3"]
 
 

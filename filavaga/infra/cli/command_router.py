@@ -65,6 +65,7 @@ class ArgparseCLIAdapter:
         match_usecase: IMatchVacancyUseCase | None,
         presenter: RichConsolePresenter | None = None,
         repository: IStateRepository | None = None,
+        translation_service = None,
     ):
         """
         Initialize the adapter with required inbound use cases.
@@ -73,6 +74,7 @@ class ArgparseCLIAdapter:
         self._match_usecase = match_usecase
         self._presenter = presenter or RichConsolePresenter()
         self._repository = repository
+        self._translation_service = translation_service
 
     def run(self, args: list[str] | None = None) -> None:
         """
@@ -81,6 +83,7 @@ class ArgparseCLIAdapter:
         parser = argparse.ArgumentParser(
             description="FilaVaga Engine - Local High-Precision Queue CLI Management Tool"
         )
+        parser.add_argument("--lang", "-l", help="Language code (pt, en, es, fr, de)")
         subparsers = parser.add_subparsers(dest="command", required=True, help="Available commands")
 
         # 1. Register Command Subparser
@@ -101,6 +104,10 @@ class ArgparseCLIAdapter:
 
         # Parse args
         parsed_args = parser.parse_args(args)
+
+        if self._translation_service:
+            resolved_lang = self._translation_service.resolve_lang(parsed_args.lang)
+            self._translation_service.load_language(resolved_lang)
 
         try:
             if parsed_args.command == "register":

@@ -16,6 +16,9 @@ from filavaga.infra.cli.presenter import RichConsolePresenter
 from filavaga.infra.logger import configure_logging
 
 
+from filavaga.infra.translation import TranslationService
+
+
 def main():
     """
     Main entry point for bootstrapping the application.
@@ -31,6 +34,7 @@ def main():
     clock = SystemClock()
     repository = AtomicJsonRepository(db_path)
     uow = JsonUnitOfWork(repository)
+    translation_service = TranslationService()
     presenter = RichConsolePresenter()
     
     # 3. Instantiate Core Services (Inbound Ports implementation)
@@ -42,7 +46,8 @@ def main():
         register_usecase=queue_manager,
         match_usecase=match_engine,
         presenter=presenter,
-        repository=repository
+        repository=repository,
+        translation_service=translation_service
     )
     cli_adapter.run()
 

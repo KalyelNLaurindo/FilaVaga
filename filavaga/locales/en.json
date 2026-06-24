@@ -1,0 +1,4 @@
+{
+  "welcome": "Welcome to FilaVaga!",
+  "candidate_registered": "Candidate {name} successfully registered with ID {id}."
+}

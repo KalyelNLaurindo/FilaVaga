@@ -14,7 +14,7 @@ import threading
 import logging
 import copy
 from filavaga.application.ports.outbound import IStateRepository, IUnitOfWork
-from filavaga.core.entities import Candidate, Vacancy, Queue
+from filavaga.core.entities import Candidate, Vacancy, Queue, QueueEntry
 
 logger = logging.getLogger("filavaga")
 
@@ -180,9 +180,14 @@ class AtomicJsonRepository(IStateRepository):
 
             queues_data = data.get("queues", {})
             for q_code, q_val in queues_data.items():
+                entries = []
+                for c_id in q_val.get("candidate_ids", []):
+                    c_obj = self._candidates.get(c_id)
+                    if c_obj:
+                        entries.append(QueueEntry(candidate_id=c_id, registered_at=c_obj.registered_at))
                 self._queues[q_code] = Queue(
                     profession_code=q_val["profession_code"],
-                    candidate_ids=q_val.get("candidate_ids", [])
+                    entries=entries
                 )
             logger.info("Successfully loaded state snapshot from disk.")
         except Exception as e:

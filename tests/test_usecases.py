@@ -152,7 +152,7 @@ def test_queue_manager_register_candidate():
 def test_match_engine_scenarios():
     """Verify that MatchEngine implements all matching heuristics, TTL validation and capacity locks."""
     from filavaga.application.services.match_engine import MatchEngine
-    from filavaga.core.entities import Candidate, Vacancy, Queue
+    from filavaga.core.entities import Candidate, Vacancy, Queue, QueueEntry
     from filavaga.core.exceptions import (
         EntityNotFoundError,
         EntityExpiredError,
@@ -200,7 +200,14 @@ def test_match_engine_scenarios():
     repo.save_candidate(c_b)
     repo.save_candidate(c_c)
 
-    queue = Queue(profession_code="4110-10", candidate_ids=["c_a", "c_b", "c_c"])
+    queue = Queue(
+        profession_code="4110-10",
+        entries=[
+            QueueEntry(candidate_id="c_a", registered_at="2026-06-15T08:00:00Z"),
+            QueueEntry(candidate_id="c_b", registered_at="2026-06-15T08:30:00Z"),
+            QueueEntry(candidate_id="c_c", registered_at="2026-06-15T09:00:00Z")
+        ]
+    )
     repo.save_queue(queue)
 
     # First match: should pick C_A (early, matches zone SUL)

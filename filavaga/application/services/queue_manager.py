@@ -66,11 +66,8 @@ class QueueManager(IRegisterCandidateUseCase):
             if not queue:
                 queue = Queue(profession_code=profession_code)
 
-            # Retrieve all active candidates to allow chronological sorting inside the queue aggregate
-            candidates_map = self._uow.repository.get_all_candidates()
-
             # Add the candidate and let the aggregate handle FIFO chronological order
-            queue.add_candidate(candidate, candidates_map)
+            queue.add_candidate(candidate.id, candidate.registered_at)
 
             # Save updated queue state
             self._uow.repository.save_queue(queue)

@@ -118,6 +118,15 @@ class Vacancy:
         self.placed_candidate_ids.append(candidate_id)
 
 
+@dataclass(frozen=True)
+class QueueEntry:
+    """
+    Value Object representing a candidate's entry in a professional queue.
+    """
+    candidate_id: str
+    registered_at: str
+
+
 @dataclass
 class Queue:
     """
@@ -126,22 +135,30 @@ class Queue:
     Ensures FIFO order based on candidate registration timestamps, preventing duplicate candidate registrations.
     """
     profession_code: str
-    candidate_ids: list[str] = field(default_factory=list)
+    entries: list[QueueEntry] = field(default_factory=list)
 
-    def add_candidate(self, candidate: Candidate, candidates_map: dict[str, Candidate]) -> None:
+    @property
+    def candidate_ids(self) -> list[str]:
+        """
+        Return the list of candidate IDs in chronological order (FIFO).
+        """
+        return [entry.candidate_id for entry in self.entries]
+
+    def add_candidate(self, candidate_id: str, registered_at: str) -> None:
         """
         Add a candidate to the queue, maintaining chronological sorting (FIFO).
         
         Raises DuplicateCandidateError if candidate is already in this queue.
         """
-        if candidate.id in self.candidate_ids:
+        if candidate_id in self.candidate_ids:
             raise DuplicateCandidateError(
-                f"Candidate {candidate.id} already exists in queue {self.profession_code}"
+                f"Candidate {candidate_id} already exists in queue {self.profession_code}"
             )
 
-        self.candidate_ids.append(candidate.id)
+        self.entries.append(QueueEntry(candidate_id=candidate_id, registered_at=registered_at))
         # Chronological sort using registered_at timestamp
-        self.candidate_ids.sort(key=lambda c_id: candidates_map[c_id].registered_at)
+        self.entries.sort(key=lambda entry: entry.registered_at)
+
 
 
 

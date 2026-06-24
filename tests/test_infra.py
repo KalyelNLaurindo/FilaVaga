@@ -530,6 +530,70 @@ def test_atomic_json_repository_secure_permissions_windows(tmp_path):
     assert "(I)" not in dir_output
 
 
+def test_atomic_json_repository_mutability_protection(tmp_path):
+    """Verify that AtomicJsonRepository protects against reference leaks and state mutation."""
+    from filavaga.infra.persistence.atomic_json import AtomicJsonRepository
+    from filavaga.core.entities import Candidate, Vacancy, Queue
+    
+    db_file = tmp_path / "state_snapshot.json"
+    repo = AtomicJsonRepository(str(db_file))
+    
+    # 1. Test Candidate Mutability Protection (Read Isolation)
+    candidate = Candidate(
+        id="c_1", name="Maria Silva", sector_zone="SUL",
+        profession_code="4110-10", registered_at="2026-06-15T08:00:00Z"
+    )
+    repo.save_candidate(candidate)
+    
+    retrieved_candidate = repo.get_candidate("c_1")
+    # Mutate the returned candidate directly (without saving)
+    retrieved_candidate.name = "Modified Name"
+    
+    # Retrieving it again should return the original name
+    assert repo.get_candidate("c_1").name == "Maria Silva"
+    
+    # 2. Test Candidate Mutability Protection (Write Isolation)
+    candidate.name = "Another Name"
+    repo.save_candidate(candidate)
+    # Mutate original candidate object after save
+    candidate.name = "Mutated After Save"
+    assert repo.get_candidate("c_1").name == "Another Name"
+    
+    # 3. Test get_all_candidates isolation
+    all_candidates = repo.get_all_candidates()
+    all_candidates["c_1"].name = "Mutated in dict"
+    assert repo.get_candidate("c_1").name == "Another Name"
+
+    # 4. Test Vacancy Mutability Protection (Read & Write Isolation)
+    vacancy = Vacancy(
+        id="v_1", title="Auxiliar", profession_code="4110-10",
+        sector_zone="SUL", capacity=2, created_at="2026-06-15T10:00:00Z",
+        expires_at="2026-06-16T10:00:00Z"
+    )
+    repo.save_vacancy(vacancy)
+    retrieved_vacancy = repo.get_vacancy("v_1")
+    retrieved_vacancy.capacity = 10
+    assert repo.get_vacancy("v_1").capacity == 2
+    
+    vacancy.capacity = 5
+    repo.save_vacancy(vacancy)
+    vacancy.capacity = 20
+    assert repo.get_vacancy("v_1").capacity == 5
+    
+    # 5. Test Queue Mutability Protection (Read & Write Isolation)
+    queue = Queue(profession_code="4110-10", candidate_ids=["c_1"])
+    repo.save_queue(queue)
+    retrieved_queue = repo.get_queue("4110-10")
+    retrieved_queue.candidate_ids.append("c_2")
+    assert repo.get_queue("4110-10").candidate_ids == ["c_1"]
+    
+    queue.candidate_ids.append("c_3")
+    repo.save_queue(queue)
+    queue.candidate_ids.append("c_4")
+    assert repo.get_queue("4110-10").candidate_ids == ["c_1", "c_3"]
+
+
+
 
 
 

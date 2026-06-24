@@ -12,6 +12,7 @@ import json
 import shutil
 import threading
 import logging
+import copy
 from filavaga.application.ports.outbound import IStateRepository
 from filavaga.core.entities import Candidate, Vacancy, Queue
 
@@ -94,37 +95,40 @@ class AtomicJsonRepository(IStateRepository):
 
     def get_candidate(self, candidate_id: str) -> Candidate | None:
         with self._lock:
-            return self._candidates.get(candidate_id)
+            candidate = self._candidates.get(candidate_id)
+            return copy.deepcopy(candidate) if candidate else None
 
     def save_candidate(self, candidate: Candidate) -> None:
         with self._lock:
-            self._candidates[candidate.id] = candidate
+            self._candidates[candidate.id] = copy.deepcopy(candidate)
             self._save_state_to_disk()
 
     def get_all_candidates(self) -> dict[str, Candidate]:
         with self._lock:
-            return dict(self._candidates)
+            return {c_id: copy.deepcopy(c) for c_id, c in self._candidates.items()}
 
     def get_vacancy(self, vacancy_id: str) -> Vacancy | None:
         with self._lock:
-            return self._vacancies.get(vacancy_id)
+            vacancy = self._vacancies.get(vacancy_id)
+            return copy.deepcopy(vacancy) if vacancy else None
 
     def save_vacancy(self, vacancy: Vacancy) -> None:
         with self._lock:
-            self._vacancies[vacancy.id] = vacancy
+            self._vacancies[vacancy.id] = copy.deepcopy(vacancy)
             self._save_state_to_disk()
 
     def get_all_vacancies(self) -> dict[str, Vacancy]:
         with self._lock:
-            return dict(self._vacancies)
+            return {v_id: copy.deepcopy(v) for v_id, v in self._vacancies.items()}
 
     def get_queue(self, profession_code: str) -> Queue | None:
         with self._lock:
-            return self._queues.get(profession_code)
+            queue = self._queues.get(profession_code)
+            return copy.deepcopy(queue) if queue else None
 
     def save_queue(self, queue: Queue) -> None:
         with self._lock:
-            self._queues[queue.profession_code] = queue
+            self._queues[queue.profession_code] = copy.deepcopy(queue)
             self._save_state_to_disk()
 
     def _load_state_from_disk(self) -> None:

@@ -84,7 +84,7 @@ class ArgparseCLIAdapter:
             description="FilaVaga Engine - Local High-Precision Queue CLI Management Tool"
         )
         parser.add_argument("--lang", "-l", help="Language code (pt, en, es, fr, de)")
-        subparsers = parser.add_subparsers(dest="command", required=True, help="Available commands")
+        subparsers = parser.add_subparsers(dest="command", required=False, help="Available commands")
 
         # 1. Register Command Subparser
         register_parser = subparsers.add_parser("register", help="Register a candidate in a FIFO queue")
@@ -109,8 +109,10 @@ class ArgparseCLIAdapter:
             resolved_lang = self._translation_service.resolve_lang(parsed_args.lang)
             self._translation_service.load_language(resolved_lang)
 
+        command = parsed_args.command or "dashboard"
+
         try:
-            if parsed_args.command == "register":
+            if command == "register":
                 if not self._register_usecase:
                     raise RuntimeError("Registration usecase is not configured.")
                 candidate = self._register_usecase.register_candidate(
@@ -120,7 +122,7 @@ class ArgparseCLIAdapter:
                 )
                 self._presenter.display_candidate_registration(candidate)
 
-            elif parsed_args.command == "match":
+            elif command == "match":
                 if not self._match_usecase:
                     raise RuntimeError("Match usecase is not configured.")
                 candidate = self._match_usecase.match_vacancy(vacancy_id=parsed_args.id)
@@ -129,13 +131,13 @@ class ArgparseCLIAdapter:
                 else:
                     self._presenter.display_no_match(parsed_args.id)
 
-            elif parsed_args.command == "dashboard":
+            elif command == "dashboard":
                 if not self._repository:
                     raise RuntimeError("Repository is not configured for dashboard view.")
                 
                 self._run_interactive_dashboard_loop()
 
-            elif parsed_args.command == "purge-all":
+            elif command == "purge-all":
                 db_path = None
                 if self._repository and hasattr(self._repository, "filepath"):
                     db_path = self._repository.filepath

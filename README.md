@@ -73,11 +73,19 @@ The command-line interface is optimized for high keyboard throughput. Use the fo
 
 | Command / Action                | Syntax                                                   | Description                                                                               | Example                                                               |
 | :------------------------------ | :------------------------------------------------------- | :---------------------------------------------------------------------------------------- | :-------------------------------------------------------------------- |
+| **Global Language Option**      | `--lang <lang>` or `-l <lang>`                           | Sets the active session language (supports: `pt`, `en`, `es`, `fr`, `de`).                | `filavaga --lang en dashboard`                                        |
 | **Register Candidate**          | `register --name "<name>" --cbo "<cbo>" --zone "<zona>"` | Appends a new candidate to the tail of the matching FIFO sub-queue.                       | `filavaga register --name "Maria Silva" --cbo "4110-10" --zone "SUL"` |
 | **Interactive Match**           | `match --id "<vacancy_id>"`                              | Validates vacancy TTL, pulls priority candidate, and starts interactive matching session. | `filavaga match --id "v_01h3nbfa4y1z8"`                               |
-| **View Dashboard**              | `dashboard`                                              | Renders the central console TUI displaying active queues and expiring vacancies.          | `filavaga dashboard`                                                  |
+| **Interactive Dashboard**       | `dashboard`                                              | Launches the interactive TUI shell manager supporting single-character hotkey actions.   | `filavaga dashboard`                                                  |
 | **Update Status Manually**      | `status-update --candidate "<id>" --to "<status>"`       | Transitions candidate state machine (`PENDING`, `CONTACTED`, `PLACED`, `REJECTED`).       | `filavaga status-update --candidate "c_01h3n" --to "PLACED"`          |
 | **Purge PII (LGPD Compliance)** | `purge-all`                                              | Clears all personal identifiable information (PII) from local data directories.           | `filavaga purge-all`                                                  |
+
+> [!TIP]
+> **Dashboard Interactive Shortcuts:**
+> * `[C]` / `[c]` — Interactively registers a new candidate.
+> * `[M]` / `[m]` — Interactively matches a vacancy to the highest priority candidate.
+> * `[L]` / `[l]` — Launches the dynamic language selection dialog (1: pt, 2: en, 3: es, 4: fr, 5: de).
+> * `[Q]` / `[q]` — Exits the interactive TUI session.
 
 > [!NOTE]
 > **Data & Validation Rules:**
@@ -92,13 +100,14 @@ The command-line interface is optimized for high keyboard throughput. Use the fo
 
 FilaVaga relies on a streamlined, zero-dependency local footprint to bypass administrative execution restrictions.
 
-| Architectural Layer    | Component / Technology                         | Technical Rationale                                                                      |
-| :--------------------- | :--------------------------------------------- | :--------------------------------------------------------------------------------------- |
-| **Client / Presenter** | Python Native CLI (Argparse & Rich Output)     | Ensures 100% compatibility with terminal screen readers (NVDA/JAWS) and legacy consoles. |
-| **Execution Engine**   | Python 3.10+ Standard Library                  | Eliminates runtime compilation issues. Uses standard collections (`collections.deque`).  |
-| **Memory Management**  | Thread-Safe Thread Locks (`threading.Lock`)    | Prevents in-memory race conditions during concurrent CLI session exports.                |
-| **Database & Ledger**  | In-Memory Index Hashmaps (`dict`)              | Achieves sub-millisecond query lookups ($O(1)$) without DBMS server dependencies.        |
-| **Persistence Drive**  | Atomic JSON Serializer (`state_snapshot.json`) | Protects data state by using double-buffer writes (temp files + atomic renames).         |
+| Architectural Layer        | Component / Technology                                       | Technical Rationale                                                                      |
+| :------------------------- | :----------------------------------------------------------- | :--------------------------------------------------------------------------------------- |
+| **Client / Presenter**     | Python Native CLI (Argparse & Rich Output)                   | Ensures 100% compatibility with terminal screen readers (NVDA/JAWS) and legacy consoles. |
+| **i18n Translation Engine**| Custom Translation Service (`translation.py` + JSON locales) | Resolves active language using strict precedence rules with directory traversal safety.   |
+| **Execution Engine**       | Python 3.10+ Standard Library                                | Eliminates runtime compilation issues. Uses standard collections (`collections.deque`).  |
+| **Memory Management**      | Reentrant Thread Locks (`threading.RLock`)                   | Prevents in-memory race conditions during concurrent CLI session exports.                |
+| **Database & Ledger**      | In-Memory Index Hashmaps (`dict`)                            | Achieves sub-millisecond query lookups ($O(1)$) without DBMS server dependencies.        |
+| **Persistence Drive**      | Atomic JSON Serializer (`state_snapshot.json`)               | Protects data state by using double-buffer writes (temp files + atomic renames).         |
 
 ---
 
@@ -122,6 +131,13 @@ FilaVaga/
 │   ├── __init__.py
 │   ├── main.py                 # CLI entry point bootstrap coordinator
 │   │
+│   ├── locales/                # JSON Translation locale resources
+│   │   ├── pt.json
+│   │   ├── en.json
+│   │   ├── es.json
+│   │   ├── fr.json
+│   │   └── de.json
+│   │
 │   ├── core/                   # Domain Core Layer (Pure Logic)
 │   │   ├── __init__.py
 │   │   ├── entities.py         # Invariant Business Models (Candidate, Vacancy, Queue)
@@ -138,6 +154,7 @@ FilaVaga/
 │   ├── infra/                  # Infrastructure Adapter Layer (Concrete Drivers)
 │   │   ├── __init__.py
 │   │   ├── logger.py           # Structured JSON logging configurations
+│   │   ├── translation.py      # i18n Translation Service engine
 │   │   ├── cli/                # Terminal CLI UI Adapters (Argparse, Presenter)
 │   │   │   ├── command_router.py
 │   │   │   └── presenter.py
@@ -149,7 +166,10 @@ FilaVaga/
     ├── __init__.py
     ├── test_domain.py          # Domain invariant checks
     ├── test_usecases.py        # Mocked use case flow matching logic
-    └── test_infra.py           # Atomic I/O write recovery assertions
+    ├── test_infra.py           # Atomic I/O write recovery assertions
+    ├── test_i18n.py            # Translation resolution logic validation
+    ├── test_interactive.py     # Menu loop and hotkey validation
+    └── test_presenter_i18n.py  # Localized console rendering validation
 ```
 
 ---
@@ -161,6 +181,10 @@ FilaVaga/
 - **Language Environment:** Python 3.10+ installed on the host system.
 - **Package Manager:** `pip` and `virtualenv` recommended.
 - **External Services:** None (100% offline-first application).
+
+> [!NOTE]
+> **ASCII Fallback Mode:**
+> If you are running the application in a legacy terminal or using screen readers that do not support unicode box-drawing characters, set the environment variable `FILAVAGA_ASCII=1` to force the UI presenter to render clean ASCII-only tables and borders.
 
 ### **6.2. Initial Bootstrap Sequence**
 

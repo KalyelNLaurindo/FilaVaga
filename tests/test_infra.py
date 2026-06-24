@@ -453,6 +453,84 @@ def test_argparse_cli_adapter_purge_all(tmp_path, capsys):
     assert "Success" in captured.out or "Purge" in captured.out
 
 
+def test_atomic_json_repository_secure_permissions_posix(tmp_path):
+    """Verify that AtomicJsonRepository enforces POSIX 0700/0600 folder/file permissions."""
+    import sys
+    if sys.platform == "win32":
+        pytest.skip("POSIX permissions test skipped on Windows")
+        
+    from filavaga.infra.persistence.atomic_json import AtomicJsonRepository
+    from filavaga.core.entities import Candidate
+    import stat
+    
+    db_dir = tmp_path / "subdir"
+    db_file = db_dir / "state_snapshot.json"
+    
+    repo = AtomicJsonRepository(str(db_file))
+    candidate = Candidate(
+        id="c_1", name="Maria Silva", sector_zone="SUL",
+        profession_code="4110-10", registered_at="2026-06-15T08:00:00Z"
+    )
+    repo.save_candidate(candidate)
+    
+    # Verify directory has 0700
+    dir_mode = os.stat(str(db_dir)).st_mode
+    assert stat.S_IMODE(dir_mode) == 0o700
+    
+    # Verify database file has 0600
+    file_mode = os.stat(str(db_file)).st_mode
+    assert stat.S_IMODE(file_mode) == 0o600
+    
+    # Save again to trigger backup creation
+    repo.save_candidate(candidate)
+    
+    bak_file = db_dir / "state_snapshot.json.bak"
+    assert os.path.exists(bak_file)
+    bak_mode = os.stat(str(bak_file)).st_mode
+    assert stat.S_IMODE(bak_mode) == 0o600
+
+
+def test_atomic_json_repository_secure_permissions_windows(tmp_path):
+    """Verify that AtomicJsonRepository restricts Windows DACLs to current user and SYSTEM."""
+    import sys
+    if sys.platform != "win32":
+        pytest.skip("Windows permissions test skipped on POSIX")
+        
+    from filavaga.infra.persistence.atomic_json import AtomicJsonRepository
+    from filavaga.core.entities import Candidate
+    import subprocess
+    import getpass
+    
+    db_dir = tmp_path / "subdir"
+    db_file = db_dir / "state_snapshot.json"
+    
+    repo = AtomicJsonRepository(str(db_file))
+    candidate = Candidate(
+        id="c_1", name="Maria Silva", sector_zone="SUL",
+        profession_code="4110-10", registered_at="2026-06-15T08:00:00Z"
+    )
+    repo.save_candidate(candidate)
+    repo.save_candidate(candidate)  # Trigger backup file
+    
+    # Let's inspect permissions using icacls
+    # We check that icacls output on db_file does not contain "Users" or "Everyone" or "(I)"
+    result = subprocess.run(["icacls", str(db_file)], capture_output=True, text=True, check=True)
+    output = result.stdout
+    
+    # Verify inheritance is disabled (no (I) flag in any access control entries)
+    assert "(I)" not in output
+    
+    # Also verify that SYSTEM or current user is explicitly granted access
+    username = getpass.getuser()
+    assert username.lower() in output.lower() or os.environ.get("USERNAME", "").lower() in output.lower()
+    
+    # Check directory as well
+    dir_result = subprocess.run(["icacls", str(db_dir)], capture_output=True, text=True, check=True)
+    dir_output = dir_result.stdout
+    assert "(I)" not in dir_output
+
+
+
 
 
 

@@ -32,7 +32,58 @@ class AtomicJsonRepository(IStateRepository):
         self._candidates = {}
         self._vacancies = {}
         self._queues = {}
+        
+        # Ensure parent directory exists and apply secure permissions
+        parent_dir = os.path.dirname(self._filepath)
+        if parent_dir:
+            os.makedirs(parent_dir, exist_ok=True)
+            self._apply_secure_permissions(parent_dir, is_dir=True)
+            
         self._load_state_from_disk()
+
+    def _apply_secure_permissions(self, path: str, is_dir: bool = False) -> None:
+        """
+        Enforce strict file-system access control lists/permissions on both POSIX and Windows.
+        POSIX: 0700 for directories, 0600 for files.
+        Windows: Disable inheritance and grant Full Control only to current user and SYSTEM.
+        """
+        if not os.path.exists(path):
+            return
+
+        if os.name != "nt":
+            # POSIX permission hardening
+            mode = 0o700 if is_dir else 0o600
+            try:
+                os.chmod(path, mode)
+            except Exception as e:
+                logger.warning("Failed to apply POSIX permissions on %s: %s", path, e)
+        else:
+            # Windows security hardening (using native icacls utility)
+            import subprocess
+            import getpass
+            try:
+                # 1. Disable inheritance and remove all inherited ACEs
+                subprocess.run(
+                    ["icacls", path, "/inheritance:r"],
+                    capture_output=True, check=True, text=True
+                )
+                
+                # 2. Grant Full Control (F) to SYSTEM (S-1-5-18)
+                inherit_flag = "(OI)(CI)" if is_dir else ""
+                subprocess.run(
+                    ["icacls", path, "/grant:r", f"*S-1-5-18:{inherit_flag}F"],
+                    capture_output=True, check=True, text=True
+                )
+                
+                # 3. Grant Full Control (F) to the current user
+                username = getpass.getuser()
+                subprocess.run(
+                    ["icacls", path, "/grant:r", f"{username}:{inherit_flag}F"],
+                    capture_output=True, check=True, text=True
+                )
+            except Exception as e:
+                logger.warning("Failed to apply Windows DACL permissions on %s: %s", path, e)
+
 
     @property
     def filepath(self) -> str:
@@ -136,6 +187,7 @@ class AtomicJsonRepository(IStateRepository):
                     if os.path.exists(err_path):
                         os.remove(err_path)
                     os.rename(self._filepath, err_path)
+                    self._apply_secure_permissions(err_path, is_dir=False)
             except Exception as isolation_err:
                 logger.error("Failed to isolate corrupted file to %s. Error: %s", err_path, isolation_err)
                 
@@ -145,6 +197,7 @@ class AtomicJsonRepository(IStateRepository):
                 try:
                     logger.info("Restoring backup from %s.", bak_path)
                     shutil.copy2(bak_path, self._filepath)
+                    self._apply_secure_permissions(self._filepath, is_dir=False)
                     self._load_state_from_disk()
                 except Exception as ex:
                     logger.error("Failed to restore backup snapshot. Error: %s. Resetting to empty state.", ex)
@@ -163,6 +216,7 @@ class AtomicJsonRepository(IStateRepository):
         parent_dir = os.path.dirname(self._filepath)
         if parent_dir:
             os.makedirs(parent_dir, exist_ok=True)
+            self._apply_secure_permissions(parent_dir, is_dir=True)
 
         # Build payload dicts
         candidates_json = {
@@ -218,13 +272,18 @@ class AtomicJsonRepository(IStateRepository):
             with open(tmp_path, "w", encoding="utf-8") as f:
                 json.dump(payload, f, indent=2, ensure_ascii=False)
 
+            # Apply secure permissions to temporary file
+            self._apply_secure_permissions(tmp_path, is_dir=False)
+
             # 2. Backup the old active file if it exists
             if os.path.exists(self._filepath):
                 logger.debug("Backing up active snapshot file to %s.", bak_path)
                 shutil.copy2(self._filepath, bak_path)
+                self._apply_secure_permissions(bak_path, is_dir=False)
 
             # 3. Perform OS atomic replace (rename staging to active)
             os.replace(tmp_path, self._filepath)
+            self._apply_secure_permissions(self._filepath, is_dir=False)
             logger.info("Successfully saved state snapshot atomically to %s.", self._filepath)
         except Exception as e:
             logger.error("Failed to save state snapshot to disk. Error: %s", e)

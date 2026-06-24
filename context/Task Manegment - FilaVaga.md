@@ -152,7 +152,7 @@ Tasks are mapped bottom-up matching the hexagonal boundaries and dependencies.
   - _Metrics:_ Reach: 90 | Impact: 2.5 | Confidence: 0.9 | Effort: 1 (1 SP)
   - _RICE Score:_ 202.5
   - _TDD Test File:_ `tests/test_infra.py`
-  - _Status:_ To Do
+  - _Status:_ Done
 
 ### **🔒 Backlog Phase 5.1: Security Hardening & Encapsulation**
 
@@ -281,7 +281,6 @@ Tasks are mapped bottom-up matching the hexagonal boundaries and dependencies.
 - [ ] [**TSK-19**](backlog/TSK-19.md)**:** Historical Archiving & Snapshot Optimization (2 SP)
 - [ ] [**TSK-20**](backlog/TSK-20.md)**:** Interactive Configuration Wizard (2 SP)
 - [ ] [**TSK-21**](backlog/TSK-21.md)**:** Anonymized Placement Analytics Export (2 SP)
-- [ ] [**TSK-26**](backlog/TSK-26.md)**:** File-System Access Permission Hardening (1 SP)
 - [ ] [**TSK-27**](backlog/TSK-27.md)**:** Repository Reference Leak & Mutability Protection (1 SP)
 - [ ] [**TSK-28**](backlog/TSK-28.md)**:** i18n Translation Engine & Language Configuration Loader (2 SP)
 - [ ] [**TSK-29**](backlog/TSK-29.md)**:** UI RichConsolePresenter Key-based Translation Mapping (2 SP)
@@ -325,5 +324,6 @@ _None._
 - [x] [**TSK-15**](backlog/TSK-15.md)**:** Self-Healing JSON Schema Validator & Backup Recovery (2 SP)
 - [x] [**TSK-16**](backlog/TSK-16.md)**:** LGPD-Compliant "purge-all" Safe Data Scrubber (1 SP)
 - [x] [**TSK-17**](backlog/TSK-17.md)**:** PyProject Configuration & PyInstaller Standalone Compilation (2 SP)
+- [x] [**TSK-26**](backlog/TSK-26.md)**:** File-System Access Permission Hardening (1 SP)
 
 _Signed by:_ Kalyel N. Laurindo / Project Owner

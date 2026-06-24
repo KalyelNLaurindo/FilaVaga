@@ -166,8 +166,8 @@ filavaga-cli/
 1. Clone this repository to your local workstation:
 
    ```bash
-   git clone https://github.com/your-org/filavaga-cli.git
-   cd filavaga-cli
+   git clone https://github.com/KalyelNLaurindo/filavaga.git
+   cd filavaga
    ```
 
 2. Create and activate a local Python virtual environment:

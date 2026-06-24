@@ -17,7 +17,7 @@ On POSIX platforms, enforce `0700` permissions on the data directory and `0600` 
 
 ## 🏁 Definition of Done (DoD) & Acceptance Criteria
 
-* [ ] **[Testing/Quality - TDD]:** Unit/Integration tests verify that newly created snapshot and backup files are assigned restricted permissions matching the expected octal mode (`0600`) on Unix systems.
-* [ ] **[Functional - Security]:** At repository startup and during write stages, directory permissions are validated/updated to ensure only the owner has read/write/traverse rights (`0700`).
-* [ ] **[Functional - Windows ACLs]:** On Windows hosts, use standard system library calls to ensure the file security descriptor prevents other local users from opening the database.
-* [ ] **[Verification]:** `pytest tests/test_infra.py` passes 100% green.
+* [x] **[Testing/Quality - TDD]:** Unit/Integration tests verify that newly created snapshot and backup files are assigned restricted permissions matching the expected octal mode (`0600`) on Unix systems.
+* [x] **[Functional - Security]:** At repository startup and during write stages, directory permissions are validated/updated to ensure only the owner has read/write/traverse rights (`0700`).
+* [x] **[Functional - Windows ACLs]:** On Windows hosts, use standard system library calls to ensure the file security descriptor prevents other local users from opening the database.
+* [x] **[Verification]:** `pytest tests/test_infra.py` passes 100% green.

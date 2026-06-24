@@ -19,8 +19,8 @@ This task introduces deep copying (`copy.deepcopy`) on both read operations (ret
 
 ## 🏁 Definition of Done (DoD) & Acceptance Criteria
 
-* [ ] **[Testing/Quality - TDD]:** Integration tests verify that modifying an entity returned by `get_candidate`, `get_all_candidates`, `get_vacancy`, `get_all_vacancies`, or `get_queue` does not mutate the internal repository state or the next returned instance of that entity.
-* [ ] **[Testing/Quality - TDD]:** Integration tests verify that modifying an entity *after* passing it to `save_candidate`, `save_vacancy`, or `save_queue` does not affect the stored state inside the repository.
-* [ ] **[Functional - Read Isolation]:** Methods `get_candidate`, `get_all_candidates`, `get_vacancy`, `get_all_vacancies`, and `get_queue` return deep copies of the internal dict objects using Python's `copy.deepcopy`.
-* [ ] **[Functional - Write Isolation]:** Methods `save_candidate`, `save_vacancy`, and `save_queue` store deep copies of the passed domain models in the internal cache maps before invoking `_save_state_to_disk()`.
-* [ ] **[Verification]:** `pytest tests/test_infra.py` passes 100% green.
+* [x] **[Testing/Quality - TDD]:** Integration tests verify that modifying an entity returned by `get_candidate`, `get_all_candidates`, `get_vacancy`, `get_all_vacancies`, or `get_queue` does not mutate the internal repository state or the next returned instance of that entity.
+* [x] **[Testing/Quality - TDD]:** Integration tests verify that modifying an entity *after* passing it to `save_candidate`, `save_vacancy`, or `save_queue` does not affect the stored state inside the repository.
+* [x] **[Functional - Read Isolation]:** Methods `get_candidate`, `get_all_candidates`, `get_vacancy`, `get_all_vacancies`, and `get_queue` return deep copies of the internal dict objects using Python's `copy.deepcopy`.
+* [x] **[Functional - Write Isolation]:** Methods `save_candidate`, `save_vacancy`, and `save_queue` store deep copies of the passed domain models in the internal cache maps before invoking `_save_state_to_disk()`.
+* [x] **[Verification]:** `pytest tests/test_infra.py` passes 100% green.

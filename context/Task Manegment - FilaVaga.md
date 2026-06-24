@@ -168,7 +168,7 @@ Tasks are mapped bottom-up matching the hexagonal boundaries and dependencies.
   - _Metrics:_ Reach: 100 | Impact: 3.0 | Confidence: 1.0 | Effort: 2 (2 SP)
   - _RICE Score:_ 150.0
   - _TDD Test File:_ `tests/test_infra.py`
-  - _Status:_ To Do
+  - _Status:_ Done
 
 - [**TSK-33**](backlog/TSK-33.md)**: Refactor Queue Aggregate for DDD Orthodox Self-Sufficiency**
   - _Epic/Requirement Link:_ RF01 / Domain Modeling
@@ -285,7 +285,6 @@ Tasks are mapped bottom-up matching the hexagonal boundaries and dependencies.
 - [ ] [**TSK-29**](backlog/TSK-29.md)**:** UI RichConsolePresenter Key-based Translation Mapping (2 SP)
 - [ ] [**TSK-30**](backlog/TSK-30.md)**:** Interactive Shortcuts & Layperson Menu Enhancements (1 SP)
 - [ ] [**TSK-31**](backlog/TSK-31.md)**:** CLI Accessibility Suite (Support for --no-color and Screen-Reader Linearization) (1 SP)
-- [ ] [**TSK-32**](backlog/TSK-32.md)**:** Implement Unit of Work (UoW) Pattern for Multi-Repository Atomic Transactions (2 SP)
 - [ ] [**TSK-33**](backlog/TSK-33.md)**:** Refactor Queue Aggregate for DDD Orthodox Self-Sufficiency (1 SP)
 
 
@@ -325,5 +324,6 @@ _None._
 - [x] [**TSK-17**](backlog/TSK-17.md)**:** PyProject Configuration & PyInstaller Standalone Compilation (2 SP)
 - [x] [**TSK-26**](backlog/TSK-26.md)**:** File-System Access Permission Hardening (1 SP)
 - [x] [**TSK-27**](backlog/TSK-27.md)**:** Repository Reference Leak & Mutability Protection (1 SP)
+- [x] [**TSK-32**](backlog/TSK-32.md)**:** Implement Unit of Work (UoW) Pattern for Multi-Repository Atomic Transactions (2 SP)
 
 _Signed by:_ Kalyel N. Laurindo / Project Owner

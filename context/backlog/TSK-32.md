@@ -22,7 +22,7 @@ This task will:
 
 ## 🏁 Definition of Done (DoD) & Acceptance Criteria
 
-* [ ] **[Testing/Quality - TDD]:** Test cases verify that if an exception is thrown inside a use case transaction, no changes are written to the JSON file database (Rollback).
-* [ ] **[Functional - UoW]:** Refactor `QueueManager` and application use cases to run all write queries within the `UnitOfWork` context manager.
-* [ ] **[Functional - Atomic Commit]:** The JSON database snapshot file on disk is only written once at the exit of the UoW context block instead of multiple times per operation.
-* [ ] **[Verification]:** `pytest tests/test_infra.py` passes 100% green.
+* [x] **[Testing/Quality - TDD]:** Test cases verify that if an exception is thrown inside a use case transaction, no changes are written to the JSON file database (Rollback).
+* [x] **[Functional - UoW]:** Refactor `QueueManager` and application use cases to run all write queries within the `UnitOfWork` context manager.
+* [x] **[Functional - Atomic Commit]:** The JSON database snapshot file on disk is only written once at the exit of the UoW context block instead of multiple times per operation.
+* [x] **[Verification]:** `pytest tests/test_infra.py` passes 100% green.

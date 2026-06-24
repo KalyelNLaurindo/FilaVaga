@@ -32,5 +32,14 @@
   "col_zone": "Zona",
   "col_capacity": "Capacidad",
   "col_placed": "Asignados",
-  "col_expires_at": "Expira El"
+  "col_expires_at": "Expira El",
+  "header_status": "[Idioma: {lang} | DB: {db_path} | Estado: {status}]",
+  "menu_options": "[C] Registrar | [M] Asignar Vacante | [L] Seleccionar Idioma | [Q] Salir",
+  "menu_prompt": "Elija una opción: ",
+  "prompt_enter_name": "Ingrese el Nombre del Candidato: ",
+  "prompt_enter_cbo": "Ingrese el Código CBO de la Profesión: ",
+  "prompt_enter_zone": "Ingrese la Zona de Preferencia: ",
+  "prompt_enter_vacancy_id": "Ingrese el ID de la Vacante: ",
+  "prompt_lang_menu": "Seleccione el Idioma:\n1: Português\n2: English\n3: Español\n4: Français\n5: Deutsch\nElija un número: ",
+  "press_enter": "Presione Enter para continuar..."
 }

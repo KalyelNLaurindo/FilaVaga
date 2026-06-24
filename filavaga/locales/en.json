@@ -32,5 +32,14 @@
   "col_zone": "Zone",
   "col_capacity": "Capacity",
   "col_placed": "Placed",
-  "col_expires_at": "Expires At"
+  "col_expires_at": "Expires At",
+  "header_status": "[Language: {lang} | DB: {db_path} | Status: {status}]",
+  "menu_options": "[C] Register | [M] Match | [L] Language Selection | [Q] Quit",
+  "menu_prompt": "Choose an option: ",
+  "prompt_enter_name": "Enter Candidate Name: ",
+  "prompt_enter_cbo": "Enter Profession CBO Code: ",
+  "prompt_enter_zone": "Enter Zone Preference: ",
+  "prompt_enter_vacancy_id": "Enter Vacancy ID: ",
+  "prompt_lang_menu": "Select Language:\n1: Português\n2: English\n3: Español\n4: Français\n5: Deutsch\nChoose a number: ",
+  "press_enter": "Press Enter to continue..."
 }

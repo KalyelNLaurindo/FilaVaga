@@ -132,6 +132,7 @@ def test_argparse_cli_lang(tmp_path):
     mock_repo.get_all_vacancies.return_value = {}
     
     adapter._repository = mock_repo
+    adapter._run_interactive_dashboard_loop = MagicMock()
     
     # Let's run and verify it resolves active_lang as "en"
     adapter.run(["--lang", "en", "dashboard"])

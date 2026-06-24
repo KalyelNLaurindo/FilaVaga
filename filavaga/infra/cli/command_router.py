@@ -133,25 +133,7 @@ class ArgparseCLIAdapter:
                 if not self._repository:
                     raise RuntimeError("Repository is not configured for dashboard view.")
                 
-                candidates_map = self._repository.get_all_candidates()
-                vacancies_map = self._repository.get_all_vacancies()
-                
-                # Fetch all existing queues by retrieving all unique profession codes
-                cbo_codes = set()
-                cbo_codes.update(c.profession_code for c in candidates_map.values())
-                cbo_codes.update(v.profession_code for v in vacancies_map.values())
-                
-                queues_map = {}
-                for code in cbo_codes:
-                    q = self._repository.get_queue(code)
-                    if q:
-                        queues_map[code] = q
-                        
-                self._presenter.display_dashboard(
-                    candidates=candidates_map,
-                    vacancies=vacancies_map,
-                    queues=queues_map
-                )
+                self._run_interactive_dashboard_loop()
 
             elif parsed_args.command == "purge-all":
                 db_path = None
@@ -186,3 +168,120 @@ class ArgparseCLIAdapter:
         except Exception as e:
             self._presenter.display_error("System Error", str(e))
             sys.exit(1)
+
+    def _run_interactive_dashboard_loop(self) -> None:
+        """
+        Runs the interactive CLI dashboard loop.
+        Allows counselors to perform matching, candidate registration,
+        language switching, or quit using single-character shortcuts.
+        """
+        from filavaga.core.exceptions import FilaVagaDomainError
+
+        while True:
+            # 1. Fetch current repository files state
+            candidates_map = self._repository.get_all_candidates() if self._repository else {}
+            vacancies_map = self._repository.get_all_vacancies() if self._repository else {}
+
+            # Fetch all existing queues
+            cbo_codes = set()
+            cbo_codes.update(c.profession_code for c in candidates_map.values())
+            cbo_codes.update(v.profession_code for v in vacancies_map.values())
+
+            queues_map = {}
+            for code in cbo_codes:
+                q = self._repository.get_queue(code)
+                if q:
+                    queues_map[code] = q
+
+            # 2. Print status header
+            lang_code = self._translation_service._active_lang if self._translation_service else "pt"
+            db_path_str = self._repository.filepath if self._repository else "In-Memory"
+            db_status_str = "OK" if self._repository and os.path.exists(os.path.dirname(self._repository.filepath)) else "N/A"
+
+            status_header = self._presenter.translation_service.translate(
+                "header_status",
+                lang=lang_code.upper(),
+                db_path=db_path_str,
+                status=db_status_str
+            )
+            self._presenter.console.print(f"[bold white on blue]{status_header}[/bold white on blue]")
+
+            # 3. Print main dashboard
+            self._presenter.display_dashboard(
+                candidates=candidates_map,
+                vacancies=vacancies_map,
+                queues=queues_map
+            )
+
+            # 4. Display options menu
+            options_text = self._presenter.translation_service.translate("menu_options")
+            prompt_text = self._presenter.translation_service.translate("menu_prompt")
+            self._presenter.console.print(f"[bold yellow]{options_text}[/bold yellow]")
+
+            try:
+                choice = input(prompt_text).strip().lower()
+            except (KeyboardInterrupt, EOFError):
+                break
+
+            if choice == "q":
+                break
+
+            elif choice == "c":
+                name_prompt = self._presenter.translation_service.translate("prompt_enter_name")
+                cbo_prompt = self._presenter.translation_service.translate("prompt_enter_cbo")
+                zone_prompt = self._presenter.translation_service.translate("prompt_enter_zone")
+
+                try:
+                    name = input(name_prompt)
+                    cbo = input(cbo_prompt)
+                    zone = input(zone_prompt)
+
+                    if not self._register_usecase:
+                        raise RuntimeError("Registration usecase is not configured.")
+                    candidate = self._register_usecase.register_candidate(
+                        name=name,
+                        profession_code=cbo,
+                        sector_zone=zone,
+                    )
+                    self._presenter.display_candidate_registration(candidate)
+                except FilaVagaDomainError as e:
+                    self._presenter.display_error("Domain Error", str(e))
+                except Exception as e:
+                    self._presenter.display_error("System Error", str(e))
+
+                input(self._presenter.translation_service.translate("press_enter"))
+
+            elif choice == "m":
+                vac_prompt = self._presenter.translation_service.translate("prompt_enter_vacancy_id")
+                try:
+                    vac_id = input(vac_prompt)
+                    if not self._match_usecase:
+                        raise RuntimeError("Match usecase is not configured.")
+                    candidate = self._match_usecase.match_vacancy(vacancy_id=vac_id)
+                    if candidate:
+                        self._presenter.display_vacancy_match(vac_id, candidate)
+                    else:
+                        self._presenter.display_no_match(vac_id)
+                except FilaVagaDomainError as e:
+                    self._presenter.display_error("Domain Error", str(e))
+                except Exception as e:
+                    self._presenter.display_error("System Error", str(e))
+
+                input(self._presenter.translation_service.translate("press_enter"))
+
+            elif choice == "l":
+                lang_prompt = self._presenter.translation_service.translate("prompt_lang_menu")
+                lang_choice = input(lang_prompt).strip()
+                lang_mapping = {
+                    "1": "pt",
+                    "2": "en",
+                    "3": "es",
+                    "4": "fr",
+                    "5": "de"
+                }
+                selected_lang = lang_mapping.get(lang_choice)
+                if selected_lang and self._translation_service:
+                    self._translation_service.resolve_lang(selected_lang)
+                    self._translation_service.load_language(selected_lang)
+                    # Sync presenter i18n
+                    self._presenter.translation_service = self._translation_service

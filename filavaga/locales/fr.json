@@ -32,5 +32,14 @@
   "col_zone": "Zone",
   "col_capacity": "Capacité",
   "col_placed": "Pourvus",
-  "col_expires_at": "Expire Le"
+  "col_expires_at": "Expire Le",
+  "header_status": "[Langue: {lang} | DB: {db_path} | Statut: {status}]",
+  "menu_options": "[C] Enregistrer | [M] Pourvoir | [L] Sélectionner la Langue | [Q] Quitter",
+  "menu_prompt": "Choisissez une option : ",
+  "prompt_enter_name": "Saisissez le Nom du Candidat : ",
+  "prompt_enter_cbo": "Saisissez le Code CBO du Métier : ",
+  "prompt_enter_zone": "Saisissez la Zone de Préférence : ",
+  "prompt_enter_vacancy_id": "Saisissez l'ID du Poste : ",
+  "prompt_lang_menu": "Sélectionnez la Langue :\n1: Português\n2: English\n3: Español\n4: Français\n5: Deutsch\nChoisissez un nombre : ",
+  "press_enter": "Appuyez sur Entrée pour continuer..."
 }

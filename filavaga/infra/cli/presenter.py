@@ -12,6 +12,7 @@ from rich.panel import Panel
 from rich.table import Table
 from rich.text import Text
 from rich.align import Align
+from rich import box
 from filavaga.core.entities import Candidate, Vacancy, Queue
 
 
@@ -22,7 +23,7 @@ class RichConsolePresenter:
     Produces premium visual grids, status cards, and layout frames, fully localized.
     """
 
-    def __init__(self, console: Console | None = None, translation_service = None):
+    def __init__(self, console: Console | None = None, translation_service = None, ascii_only: bool = False):
         """
         Initialize the presenter with a Console instance and translation service.
         """
@@ -31,6 +32,13 @@ class RichConsolePresenter:
             from filavaga.infra.translation import TranslationService
             translation_service = TranslationService()
         self.translation_service = translation_service
+        
+        # Determine box style (ASCII fallback)
+        import os
+        if ascii_only or os.environ.get("FILAVAGA_ASCII") == "1":
+            self.box_style = box.ASCII
+        else:
+            self.box_style = box.SQUARE
 
     def display_candidate_registration(self, candidate: Candidate) -> None:
         """
@@ -55,6 +63,7 @@ class RichConsolePresenter:
             title=self.translation_service.translate('candidate_registered_title'),
             border_style="green",
             expand=False,
+            box=self.box_style,
         )
         self.console.print(panel)
 
@@ -77,6 +86,7 @@ class RichConsolePresenter:
             title=self.translation_service.translate('vacancy_matched_title'),
             border_style="cyan",
             expand=False,
+            box=self.box_style,
         )
         self.console.print(panel)
 
@@ -93,6 +103,7 @@ class RichConsolePresenter:
             title=self.translation_service.translate('no_match_title'),
             border_style="yellow",
             expand=False,
+            box=self.box_style,
         )
         self.console.print(panel)
 
@@ -108,6 +119,7 @@ class RichConsolePresenter:
             title=f"[bold red]{translated_title}[/bold red]",
             border_style="red",
             expand=False,
+            box=self.box_style,
         )
         self.console.print(panel)
 
@@ -147,13 +159,14 @@ class RichConsolePresenter:
             title=f"[bold white]{self.translation_service.translate('stats_title')}[/bold white]",
             border_style="white",
             expand=True,
+            box=self.box_style,
         )
         self.console.print(stats_panel)
         self.console.print("\n")
 
         # 2. Queues Table
         q_table_title = self.translation_service.translate('queues_table_title')
-        queues_table = Table(title=f"[bold yellow]{q_table_title}[/bold yellow]", expand=True)
+        queues_table = Table(title=f"[bold yellow]{q_table_title}[/bold yellow]", expand=True, box=self.box_style)
         queues_table.add_column(self.translation_service.translate('col_profession_cbo'), style="bold yellow")
         queues_table.add_column(self.translation_service.translate('col_queue_length'), justify="right")
         queues_table.add_column(self.translation_service.translate('col_next_candidate_id'), style="cyan")
@@ -176,7 +189,7 @@ class RichConsolePresenter:
 
         # 3. Vacancies Table
         v_table_title = self.translation_service.translate('vacancies_table_title')
-        vacancies_table = Table(title=f"[bold cyan]{v_table_title}[/bold cyan]", expand=True)
+        vacancies_table = Table(title=f"[bold cyan]{v_table_title}[/bold cyan]", expand=True, box=self.box_style)
         vacancies_table.add_column(self.translation_service.translate('col_id'), style="bold cyan")
         vacancies_table.add_column(self.translation_service.translate('col_title'))
         vacancies_table.add_column(self.translation_service.translate('col_cbo_code'))

@@ -32,5 +32,14 @@
   "col_zone": "Zone",
   "col_capacity": "Kapazität",
   "col_placed": "Besetzt",
-  "col_expires_at": "Läuft ab am"
+  "col_expires_at": "Läuft ab am",
+  "header_status": "[Sprache: {lang} | DB: {db_path} | Status: {status}]",
+  "menu_options": "[C] Registrieren | [M] Abgleichen | [L] Sprachauswahl | [Q] Beenden",
+  "menu_prompt": "Option wählen: ",
+  "prompt_enter_name": "Name des Kandidaten eingeben: ",
+  "prompt_enter_cbo": "Berufs-CBO-Code eingeben: ",
+  "prompt_enter_zone": "Bevorzugte Zone eingeben: ",
+  "prompt_enter_vacancy_id": "Stellen-ID eingeben: ",
+  "prompt_lang_menu": "Sprache auswählen:\n1: Português\n2: English\n3: Español\n4: Français\n5: Deutsch\nNummer wählen: ",
+  "press_enter": "Eingabetaste drücken, um fortzufahren..."
 }

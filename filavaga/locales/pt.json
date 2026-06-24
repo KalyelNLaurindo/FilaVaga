@@ -32,5 +32,14 @@
   "col_zone": "Zona",
   "col_capacity": "Capacidade",
   "col_placed": "Preenchidas",
-  "col_expires_at": "Expira Em"
+  "col_expires_at": "Expira Em",
+  "header_status": "[Idioma: {lang} | DB: {db_path} | Status: {status}]",
+  "menu_options": "[C] Registrar | [M] Preencher Vaga | [L] Selecionar Idioma | [Q] Sair",
+  "menu_prompt": "Escolha uma opção: ",
+  "prompt_enter_name": "Digite o Nome do Candidato: ",
+  "prompt_enter_cbo": "Digite o Código CBO da Profissão: ",
+  "prompt_enter_zone": "Digite a Zona de Preferência: ",
+  "prompt_enter_vacancy_id": "Digite o ID da Vaga: ",
+  "prompt_lang_menu": "Selecione o Idioma:\n1: Português\n2: English\n3: Español\n4: Français\n5: Deutsch\nEscolha um número: ",
+  "press_enter": "Pressione Enter para continuar..."
 }

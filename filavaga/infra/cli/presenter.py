@@ -12,7 +12,6 @@ from rich.panel import Panel
 from rich.table import Table
 from rich.text import Text
 from rich.align import Align
-from rich.columns import Columns
 from filavaga.core.entities import Candidate, Vacancy, Queue
 
 
@@ -20,36 +19,40 @@ class RichConsolePresenter:
     """
     Console UI renderer using Rich components.
     
-    Produces premium visual grids, status cards, and layout frames.
+    Produces premium visual grids, status cards, and layout frames, fully localized.
     """
 
-    def __init__(self, console: Console | None = None):
+    def __init__(self, console: Console | None = None, translation_service = None):
         """
-        Initialize the presenter with a Console instance.
+        Initialize the presenter with a Console instance and translation service.
         """
         self.console = console or Console()
+        if translation_service is None:
+            from filavaga.infra.translation import TranslationService
+            translation_service = TranslationService()
+        self.translation_service = translation_service
 
     def display_candidate_registration(self, candidate: Candidate) -> None:
         """
         Render candidate registration details in a beautiful green success Panel.
         """
         content = Text()
-        content.append("ID: ", style="bold green")
+        content.append(f"{self.translation_service.translate('label_id')}: ", style="bold green")
         content.append(f"{candidate.id}\n", style="white")
-        content.append("Name: ", style="bold green")
+        content.append(f"{self.translation_service.translate('label_name')}: ", style="bold green")
         content.append(f"{candidate.name}\n", style="white")
-        content.append("CBO (Profession): ", style="bold green")
+        content.append(f"{self.translation_service.translate('label_profession')}: ", style="bold green")
         content.append(f"{candidate.profession_code}\n", style="white")
-        content.append("Zone Preferred: ", style="bold green")
+        content.append(f"{self.translation_service.translate('label_zone')}: ", style="bold green")
         content.append(f"{candidate.sector_zone}\n", style="white")
-        content.append("Status: ", style="bold green")
+        content.append(f"{self.translation_service.translate('label_status')}: ", style="bold green")
         content.append(f"{candidate.status}\n", style="bold yellow")
-        content.append("Registered At: ", style="bold green")
+        content.append(f"{self.translation_service.translate('label_registered_at')}: ", style="bold green")
         content.append(f"{candidate.registered_at}", style="white")
 
         panel = Panel(
             content,
-            title="[bold green]Candidate Registered Successfully[/bold green]",
+            title=self.translation_service.translate('candidate_registered_title'),
             border_style="green",
             expand=False,
         )
@@ -60,18 +63,18 @@ class RichConsolePresenter:
         Render a blue info panel showing that a candidate has matched a vacancy.
         """
         content = Text()
-        content.append("Vacancy ID: ", style="bold cyan")
+        content.append(f"{self.translation_service.translate('label_vacancy_id')}: ", style="bold cyan")
         content.append(f"{vacancy_id}\n", style="white")
-        content.append("Matched Candidate ID: ", style="bold cyan")
+        content.append(f"{self.translation_service.translate('label_matched_candidate_id')}: ", style="bold cyan")
         content.append(f"{candidate.id}\n", style="white")
-        content.append("Candidate Name: ", style="bold cyan")
+        content.append(f"{self.translation_service.translate('label_candidate_name')}: ", style="bold cyan")
         content.append(f"{candidate.name}\n", style="white")
-        content.append("Candidate Status: ", style="bold cyan")
+        content.append(f"{self.translation_service.translate('label_candidate_status')}: ", style="bold cyan")
         content.append(f"{candidate.status}", style="bold yellow")
 
         panel = Panel(
             content,
-            title="[bold cyan]Vacancy Matched Successfully[/bold cyan]",
+            title=self.translation_service.translate('vacancy_matched_title'),
             border_style="cyan",
             expand=False,
         )
@@ -82,12 +85,12 @@ class RichConsolePresenter:
         Render a yellow warning panel indicating no candidate matched the vacancy.
         """
         content = Text(
-            f"No matching candidate found in the FIFO queue for vacancy: {vacancy_id}.",
+            self.translation_service.translate('no_match_content', vacancy_id=vacancy_id),
             style="bold yellow",
         )
         panel = Panel(
             content,
-            title="[bold yellow]No Match Found[/bold yellow]",
+            title=self.translation_service.translate('no_match_title'),
             border_style="yellow",
             expand=False,
         )
@@ -97,10 +100,12 @@ class RichConsolePresenter:
         """
         Render a red error panel for system or validation failures.
         """
-        content = Text(message, style="bold red")
+        translated_title = self.translation_service.translate(title)
+        translated_message = self.translation_service.translate(message)
+        content = Text(translated_message, style="bold red")
         panel = Panel(
             content,
-            title=f"[bold red]{title}[/bold red]",
+            title=f"[bold red]{translated_title}[/bold red]",
             border_style="red",
             expand=False,
         )
@@ -116,8 +121,9 @@ class RichConsolePresenter:
         Render a full status dashboard containing queue and vacancy statistics.
         """
         self.console.print("\n")
+        header_text = self.translation_service.translate('dashboard_header')
         self.console.print(
-            Align.center("[bold magenta]━━━ FilaVaga Management Dashboard ━━━[/bold magenta]")
+            Align.center(f"[bold magenta]{header_text}[/bold magenta]")
         )
         self.console.print("\n")
 
@@ -129,13 +135,16 @@ class RichConsolePresenter:
         total_queues = len(queues)
 
         stats_text = Text()
-        stats_text.append(f"Candidates: {total_candidates} ({pending_candidates} Pending)\n", style="green")
-        stats_text.append(f"Vacancies: {total_vacancies} ({active_vacancies} Active)\n", style="cyan")
-        stats_text.append(f"Active Queues: {total_queues}", style="yellow")
+        cand_str = self.translation_service.translate('stats_candidates', total=total_candidates, pending=pending_candidates)
+        vac_str = self.translation_service.translate('stats_vacancies', total=total_vacancies, active=active_vacancies)
+        q_str = self.translation_service.translate('stats_active_queues', total=total_queues)
+        stats_text.append(f"{cand_str}\n", style="green")
+        stats_text.append(f"{vac_str}\n", style="cyan")
+        stats_text.append(f"{q_str}", style="yellow")
 
         stats_panel = Panel(
             stats_text,
-            title="[bold white]System Statistics[/bold white]",
+            title=f"[bold white]{self.translation_service.translate('stats_title')}[/bold white]",
             border_style="white",
             expand=True,
         )
@@ -143,11 +152,12 @@ class RichConsolePresenter:
         self.console.print("\n")
 
         # 2. Queues Table
-        queues_table = Table(title="[bold yellow]Professional FIFO Queues[/bold yellow]", expand=True)
-        queues_table.add_column("Profession CBO", style="bold yellow")
-        queues_table.add_column("Queue Length", justify="right")
-        queues_table.add_column("Next Candidate ID", style="cyan")
-        queues_table.add_column("Next Candidate Name")
+        q_table_title = self.translation_service.translate('queues_table_title')
+        queues_table = Table(title=f"[bold yellow]{q_table_title}[/bold yellow]", expand=True)
+        queues_table.add_column(self.translation_service.translate('col_profession_cbo'), style="bold yellow")
+        queues_table.add_column(self.translation_service.translate('col_queue_length'), justify="right")
+        queues_table.add_column(self.translation_service.translate('col_next_candidate_id'), style="cyan")
+        queues_table.add_column(self.translation_service.translate('col_next_candidate_name'))
 
         for q_code, queue in queues.items():
             length = len(queue.candidate_ids)
@@ -165,14 +175,15 @@ class RichConsolePresenter:
         self.console.print("\n")
 
         # 3. Vacancies Table
-        vacancies_table = Table(title="[bold cyan]Active Vacancies[/bold cyan]", expand=True)
-        vacancies_table.add_column("ID", style="bold cyan")
-        vacancies_table.add_column("Title")
-        vacancies_table.add_column("CBO Code")
-        vacancies_table.add_column("Zone")
-        vacancies_table.add_column("Capacity", justify="right")
-        vacancies_table.add_column("Placed", justify="right")
-        vacancies_table.add_column("Expires At")
+        v_table_title = self.translation_service.translate('vacancies_table_title')
+        vacancies_table = Table(title=f"[bold cyan]{v_table_title}[/bold cyan]", expand=True)
+        vacancies_table.add_column(self.translation_service.translate('col_id'), style="bold cyan")
+        vacancies_table.add_column(self.translation_service.translate('col_title'))
+        vacancies_table.add_column(self.translation_service.translate('col_cbo_code'))
+        vacancies_table.add_column(self.translation_service.translate('col_zone'))
+        vacancies_table.add_column(self.translation_service.translate('col_capacity'), justify="right")
+        vacancies_table.add_column(self.translation_service.translate('col_placed'), justify="right")
+        vacancies_table.add_column(self.translation_service.translate('col_expires_at'))
 
         for v in vacancies.values():
             vacancies_table.add_row(

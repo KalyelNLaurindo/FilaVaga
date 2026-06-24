@@ -204,10 +204,12 @@ def test_presenter_layouts():
     """Verify that RichConsolePresenter renders candidate registration, matches, and errors correctly."""
     from filavaga.infra.cli.presenter import RichConsolePresenter
     from filavaga.core.entities import Candidate
+    from filavaga.infra.translation import TranslationService
     from rich.console import Console
     
     console = Console(record=True, width=80)
-    presenter = RichConsolePresenter(console=console)
+    service = TranslationService(default_lang="en")
+    presenter = RichConsolePresenter(console=console, translation_service=service)
     
     # 1. Test candidate registration rendering
     candidate = Candidate(

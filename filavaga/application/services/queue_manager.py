@@ -9,7 +9,7 @@ Author: Kalyel N. Laurindo / Software Engineer
 import uuid
 import logging
 from filavaga.application.ports.inbound import IRegisterCandidateUseCase
-from filavaga.application.ports.outbound import IClock, IStateRepository
+from filavaga.application.ports.outbound import IClock, IUnitOfWork
 from filavaga.core.entities import Candidate, Queue
 from filavaga.core.exceptions import FilaVagaDomainError
 
@@ -23,8 +23,8 @@ class QueueManager(IRegisterCandidateUseCase):
     Implements candidate registration and manages their lifecycle within queues.
     """
 
-    def __init__(self, repository: IStateRepository, clock: IClock):
-        self._repository = repository
+    def __init__(self, uow: IUnitOfWork, clock: IClock):
+        self._uow = uow
         self._clock = clock
 
     def register_candidate(
@@ -57,22 +57,26 @@ class QueueManager(IRegisterCandidateUseCase):
             registered_at=registered_at
         )
 
-        # Save candidate entity state
-        self._repository.save_candidate(candidate)
+        with self._uow:
+            # Save candidate entity state
+            self._uow.repository.save_candidate(candidate)
 
-        # Get or initialize the professional FIFO Queue
-        queue = self._repository.get_queue(profession_code)
-        if not queue:
-            queue = Queue(profession_code=profession_code)
+            # Get or initialize the professional FIFO Queue
+            queue = self._uow.repository.get_queue(profession_code)
+            if not queue:
+                queue = Queue(profession_code=profession_code)
 
-        # Retrieve all active candidates to allow chronological sorting inside the queue aggregate
-        candidates_map = self._repository.get_all_candidates()
+            # Retrieve all active candidates to allow chronological sorting inside the queue aggregate
+            candidates_map = self._uow.repository.get_all_candidates()
 
-        # Add the candidate and let the aggregate handle FIFO chronological order
-        queue.add_candidate(candidate, candidates_map)
+            # Add the candidate and let the aggregate handle FIFO chronological order
+            queue.add_candidate(candidate, candidates_map)
 
-        # Save updated queue state
-        self._repository.save_queue(queue)
+            # Save updated queue state
+            self._uow.repository.save_queue(queue)
+
+            self._uow.commit()
 
         logger.info("Successfully registered candidate '%s' (ID: %s) in FIFO queue.", candidate.name, candidate.id)
         return candidate
+

@@ -13,7 +13,7 @@ import shutil
 import threading
 import logging
 import copy
-from filavaga.application.ports.outbound import IStateRepository
+from filavaga.application.ports.outbound import IStateRepository, IUnitOfWork
 from filavaga.core.entities import Candidate, Vacancy, Queue
 
 logger = logging.getLogger("filavaga")
@@ -33,6 +33,7 @@ class AtomicJsonRepository(IStateRepository):
         self._candidates = {}
         self._vacancies = {}
         self._queues = {}
+        self._in_transaction = False
         
         # Ensure parent directory exists and apply secure permissions
         parent_dir = os.path.dirname(self._filepath)
@@ -101,7 +102,8 @@ class AtomicJsonRepository(IStateRepository):
     def save_candidate(self, candidate: Candidate) -> None:
         with self._lock:
             self._candidates[candidate.id] = copy.deepcopy(candidate)
-            self._save_state_to_disk()
+            if not self._in_transaction:
+                self._save_state_to_disk()
 
     def get_all_candidates(self) -> dict[str, Candidate]:
         with self._lock:
@@ -115,7 +117,8 @@ class AtomicJsonRepository(IStateRepository):
     def save_vacancy(self, vacancy: Vacancy) -> None:
         with self._lock:
             self._vacancies[vacancy.id] = copy.deepcopy(vacancy)
-            self._save_state_to_disk()
+            if not self._in_transaction:
+                self._save_state_to_disk()
 
     def get_all_vacancies(self) -> dict[str, Vacancy]:
         with self._lock:
@@ -129,7 +132,8 @@ class AtomicJsonRepository(IStateRepository):
     def save_queue(self, queue: Queue) -> None:
         with self._lock:
             self._queues[queue.profession_code] = copy.deepcopy(queue)
-            self._save_state_to_disk()
+            if not self._in_transaction:
+                self._save_state_to_disk()
 
     def _load_state_from_disk(self) -> None:
         """Read snapshot from disk, validate its schema and rebuild domain objects in memory."""
@@ -292,3 +296,53 @@ class AtomicJsonRepository(IStateRepository):
         except Exception as e:
             logger.error("Failed to save state snapshot to disk. Error: %s", e)
             raise
+
+
+class JsonUnitOfWork(IUnitOfWork):
+    """
+    Concrete implementation of Unit of Work for Json persistence.
+    
+    Guarantees that state changes are kept in memory and only written
+    to disk upon successful completion and explicit commit().
+    """
+
+    def __init__(self, repository: AtomicJsonRepository):
+        self._repository = repository
+        self._committed = False
+        self._snapshot = None
+
+    def __enter__(self) -> 'JsonUnitOfWork':
+        self._repository._lock.acquire()
+        # Take deepcopy snapshot of caches
+        self._snapshot = (
+            copy.deepcopy(self._repository._candidates),
+            copy.deepcopy(self._repository._vacancies),
+            copy.deepcopy(self._repository._queues)
+        )
+        self._repository._in_transaction = True
+        self._committed = False
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb) -> None:
+        try:
+            if exc_type is not None or not self._committed:
+                self.rollback()
+        finally:
+            self._repository._in_transaction = False
+            self._snapshot = None
+            self._repository._lock.release()
+
+    def commit(self) -> None:
+        self._repository._save_state_to_disk()
+        self._committed = True
+
+    def rollback(self) -> None:
+        if self._snapshot:
+            self._repository._candidates = self._snapshot[0]
+            self._repository._vacancies = self._snapshot[1]
+            self._repository._queues = self._snapshot[2]
+
+    @property
+    def repository(self) -> IStateRepository:
+        return self._repository
+

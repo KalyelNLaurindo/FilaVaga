@@ -10,12 +10,14 @@ def test_port_interfaces_defined():
     from filavaga.application.ports.outbound import (
         IClock,
         IStateRepository,
+        IUnitOfWork,
     )
 
     assert issubclass(IRegisterCandidateUseCase, ABC)
     assert issubclass(IMatchVacancyUseCase, ABC)
     assert issubclass(IClock, ABC)
     assert issubclass(IStateRepository, ABC)
+    assert issubclass(IUnitOfWork, ABC)
 
     # Check for abstract method presence
     assert "register_candidate" in IRegisterCandidateUseCase.__abstractmethods__
@@ -74,14 +76,38 @@ class MockStateRepository(ABC):
         self.queues[queue.profession_code] = queue
 
 
+class MockUnitOfWork(ABC):
+    """Mock implementation of the IUnitOfWork port."""
+    def __init__(self, repository):
+        self._repository = repository
+        self.committed = False
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        pass
+
+    def commit(self):
+        self.committed = True
+
+    def rollback(self):
+        pass
+
+    @property
+    def repository(self):
+        return self._repository
+
+
 def test_queue_manager_register_candidate():
     """Verify that QueueManager registers a candidate and puts them in the correct queue in FIFO order."""
     from filavaga.application.services.queue_manager import QueueManager
     from filavaga.core.exceptions import FilaVagaDomainError
 
     repo = MockStateRepository()
+    uow = MockUnitOfWork(repo)
     clock = MockClock("2026-06-15T10:00:00Z")
-    manager = QueueManager(repo, clock)
+    manager = QueueManager(uow, clock)
 
     # 1. Register candidate (Valid)
     candidate = manager.register_candidate(
@@ -107,7 +133,8 @@ def test_queue_manager_register_candidate():
 
     # 2. Register a second candidate (valid FIFO ordering check)
     clock_2 = MockClock("2026-06-15T09:00:00Z")  # earlier
-    manager_2 = QueueManager(repo, clock_2)
+    uow_2 = MockUnitOfWork(repo)
+    manager_2 = QueueManager(uow_2, clock_2)
     candidate_early = manager_2.register_candidate(
         name="Joao Cedo",
         profession_code="4110-10",
@@ -133,8 +160,9 @@ def test_match_engine_scenarios():
     )
 
     repo = MockStateRepository()
+    uow = MockUnitOfWork(repo)
     clock = MockClock("2026-06-15T12:00:00Z")
-    engine = MatchEngine(repo, clock)
+    engine = MatchEngine(uow, clock)
 
     # 1. Non-existent vacancy raises EntityNotFoundError
     with pytest.raises(EntityNotFoundError):
@@ -202,7 +230,8 @@ def test_match_engine_scenarios():
 
     # Advance clock beyond expiration time
     clock_expired = MockClock("2026-06-17T12:00:00Z")
-    engine_expired = MatchEngine(repo, clock_expired)
+    uow_expired = MockUnitOfWork(repo)
+    engine_expired = MatchEngine(uow_expired, clock_expired)
 
     with pytest.raises(EntityExpiredError):
         engine_expired.match_vacancy("v_exp")

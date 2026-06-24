@@ -593,6 +593,63 @@ def test_atomic_json_repository_mutability_protection(tmp_path):
     assert repo.get_queue("4110-10").candidate_ids == ["c_1", "c_3"]
 
 
+def test_json_unit_of_work_commit_and_rollback(tmp_path):
+    """Verify that JsonUnitOfWork commits changes successfully and rolls back on exceptions."""
+    from filavaga.infra.persistence.atomic_json import AtomicJsonRepository, JsonUnitOfWork
+    from filavaga.core.entities import Candidate
+    import os
+    
+    db_file = tmp_path / "state_snapshot.json"
+    repo = AtomicJsonRepository(str(db_file))
+    uow = JsonUnitOfWork(repo)
+    
+    candidate = Candidate(
+        id="c_1", name="Maria Silva", sector_zone="SUL",
+        profession_code="4110-10", registered_at="2026-06-15T08:00:00Z"
+    )
+    
+    # 1. Test Rollback on Exception
+    try:
+        with uow:
+            uow.repository.save_candidate(candidate)
+            assert uow.repository.get_candidate("c_1") == candidate
+            raise ValueError("Simulated error to trigger rollback")
+    except ValueError:
+        pass
+        
+    # The candidate must have been rolled back from repository memory cache
+    assert repo.get_candidate("c_1") is None
+    # No file must have been written to disk
+    assert not os.path.exists(db_file)
+    
+    # 2. Test Success Commit
+    with uow:
+        uow.repository.save_candidate(candidate)
+        uow.commit()
+        
+    # The candidate is saved in memory
+    assert repo.get_candidate("c_1") == candidate
+    # File is written to disk
+    assert os.path.exists(db_file)
+    
+    # 3. Verify read consistency after rollback
+    candidate2 = Candidate(
+        id="c_2", name="Joao Silva", sector_zone="SUL",
+        profession_code="4110-10", registered_at="2026-06-15T08:00:00Z"
+    )
+    try:
+        with uow:
+            uow.repository.save_candidate(candidate2)
+            raise ValueError("Rollback c_2")
+    except ValueError:
+        pass
+        
+    # c_1 still exists, c_2 does not
+    assert repo.get_candidate("c_1") == candidate
+    assert repo.get_candidate("c_2") is None
+
+
+
 
 
 

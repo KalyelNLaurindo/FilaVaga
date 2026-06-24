@@ -85,3 +85,34 @@ class IStateRepository(ABC):
         Save/update a queue's state in persistent storage.
         """
         pass
+
+
+class IUnitOfWork(ABC):
+    """
+    Interface for Unit of Work context manager.
+    """
+
+    @abstractmethod
+    def __enter__(self) -> 'IUnitOfWork':
+        pass
+
+    @abstractmethod
+    def __exit__(self, exc_type, exc_val, exc_tb) -> None:
+        pass
+
+    @abstractmethod
+    def commit(self) -> None:
+        pass
+
+    @abstractmethod
+    def rollback(self) -> None:
+        pass
+
+    @property
+    @abstractmethod
+    def repository(self) -> IStateRepository:
+        """
+        Provide access to the state repository managed by the Unit of Work.
+        """
+        pass
+

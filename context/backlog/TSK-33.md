@@ -47,6 +47,6 @@ Scenario: Reject duplicate candidates
   Then a DuplicateCandidateError is raised
 ```
 
-* [ ] **[Functional]:** `Queue` does not receive `candidates_map` in any of its methods.
-* [ ] **[Functional]:** Chronological FIFO sequencing is managed purely inside the `Queue` aggregate using `QueueEntry` value objects.
-* [ ] **[Verification]:** pytest runs successfully with 100% pass rate. All use case tests and persistence tests are updated to reflect the new method signature.
+* [x] **[Functional]:** `Queue` does not receive `candidates_map` in any of its methods.
+* [x] **[Functional]:** Chronological FIFO sequencing is managed purely inside the `Queue` aggregate using `QueueEntry` value objects.
+* [x] **[Verification]:** pytest runs successfully with 100% pass rate. All use case tests and persistence tests are updated to reflect the new method signature.

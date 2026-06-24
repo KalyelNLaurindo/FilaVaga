@@ -213,16 +213,16 @@ def test_queue_creation_and_chronology():
     }
 
     # Add late candidate first, then early candidate
-    queue.add_candidate(candidate_late, candidates_map)
+    queue.add_candidate(candidate_late.id, candidate_late.registered_at)
     assert queue.candidate_ids == ["c_late"]
 
     # When early is added, queue must sort chronologically
-    queue.add_candidate(candidate_early, candidates_map)
+    queue.add_candidate(candidate_early.id, candidate_early.registered_at)
     assert queue.candidate_ids == ["c_early", "c_late"]
 
     # Try adding a duplicate candidate (should raise DuplicateCandidateError)
     with pytest.raises(DuplicateCandidateError):
-        queue.add_candidate(candidate_early, candidates_map)
+        queue.add_candidate(candidate_early.id, candidate_early.registered_at)
 
 
 

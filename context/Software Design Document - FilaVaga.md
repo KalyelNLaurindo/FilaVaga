@@ -112,9 +112,9 @@ FilaVaga enforces strict architectural separation boundaries through the **Hexag
 ### **✍️ Security Specification Form**
 
 - **Field 3.1 - Data In Transit Protocol:** Local In-Memory Communication (Zero-network execution; data never traverses a local or public network card).
-- **Field 3.2 - Data At Rest Encryption Standard:** Local Directory Lock (Relies on OS ACLs. The state snapshot is kept in the user’s protected home directory: `%USERPROFILE%\.filavaga\` on Windows or `~/.filavaga/` on Linux).
+- **Field 3.2 - Data At Rest Encryption Standard:** Delegated to Operating System Level Encryption (LUKS/BitLocker). Application restricts file permissions on the storage directories and JSON database files (e.g., `0700` for directories and `0600` for files on POSIX, and restricted DACLs on Windows) to prevent local user traversal.
 - **Field 3.3 - Password & Key Derivation Function:** N/A (FilaVaga is a local utility execution system with no shared credentials. It executes under the existing host OS session authority).
-- **Field 3.4 - Access Delegation Protocol:** CLI Permission Guards (Validates read/write authorization using local file descriptor security attributes before processing commands).
+- **Field 3.4 - Access Delegation Protocol:** OS-Level Access Control Lists & Permission Guards (Restricts read/write permissions at snapshot file creation so only the owning OS user has read/write privileges).
 - **Field 3.5 - Emergency Recovery Policy:** If state data corruption occurs, FilaVaga keeps the previous valid session snapshot under `state_snapshot.json.bak`. During initialization, a schema integrity check validates the active file; if corrupted, it auto-restores the backup and displays a warning to `stderr`.
 
 ## **🧩 4. Evolutionary Blueprint (Scaling Path)**
@@ -391,6 +391,17 @@ Displayed when an invalid execution argument is provided or explicitly requested
 
   Automatically measures system terminal width via `os.get_terminal_size()`. If width is $<80$ characters, detailed candidate metadata arrays collapse into a vertical list to prevent horizontal wrapping and terminal line corruption.
 
+### **8.4. Multi-Language i18n Architecture**
+
+To support non-English or localized SINE environments, FilaVaga abstracts all UI labels, headers, and logs from execution logic:
+- **Translation Resource Files (`locales/*.json`):** Independent dictionary files mapped for `pt` (Portuguese), `en` (English), `fr` (French), `es` (Spanish), and `de` (German).
+- **Locale Resolution Precedence:**
+  1. CLI parameter override (e.g. `--lang fr`).
+  2. Configuration profile setting loaded from `config.json` (`"lang": "es"`).
+  3. Workstation host environment variable mapping (`LANG` or `LC_ALL`).
+  4. Default system fallback (`pt`).
+- **Interactive Hotkeys:** Allows layperson dynamic switching at runtime in the active shell using single-character commands.
+
 ## **📈 9. Observability & System Monitoring**
 
 - **Field 9.1 - Logging Aggregator Strategy:**
@@ -481,6 +492,24 @@ filavaga-cli/
 - **Context:** Continuous time polling loops consume system CPU cycles on legacy, resource-constrained SINE hardware.
 - **Decision:** Apply Lazy Evaluation pattern for vacancy TTL checks at execution query time.
 - **Rationale:** Vacancies are assessed and invalidated dynamically when matched against candidates, ensuring zero background processor consumption.
+
+### **ADR-004 (State Mutability and Abstraction Leak Prevention): Deep Copies on Repository Operations**
+
+- **Context:** `AtomicJsonRepository` maintains internal in-memory collections of domain models. If read methods (`get_candidate`, etc.) return direct references or shallow copies to these mutable models, the application layer can mutate their states directly. This bypasses the repository's `.save_*()` methods, causing in-memory state drift that is never serialized to disk and violates repository encapsulation.
+- **Decision:** Perform deep copies (`copy.deepcopy`) on all domain objects returned by query/read methods (`get_candidate`, `get_all_candidates`, `get_vacancy`, `get_all_vacancies`, `get_queue`) and on all objects passed to mutation/write methods (`save_candidate`, `save_vacancy`, `save_queue`) before caching them.
+- **Rationale:** Deep copying guarantees that the internal repository state cannot be mutated from the outside, enforcing a strict boundary between application runtime mutations and the persistence engine. It preserves encapsulation without requiring heavy refactoring of existing domain entities.
+
+### **ADR-005 (Transactional Consistency & Unit of Work Pattern): context manager commit orchestration**
+
+- **Context:** Sequential writes to multiple independent entities (e.g. saving a candidate status update and then saving the queue aggregate state) in the application layer can result in a "split-brain" database state if a crash or error occurs mid-way.
+- **Decision:** Introduce a Unit of Work (`IUnitOfWork`) pattern using Python context managers. All database modifications are staged in-memory within the `with` block and committed atomically to disk as a single transaction upon successful exit. Any exception raised inside the block triggers a rollback of the in-memory cache to prevent dirty states.
+- **Rationale:** Guarantees transactional atomic execution (ACID properties) in a local flat-file storage environment without database server overhead.
+
+### **ADR-006 (Aggregate Self-Sufficiency & Domain Encapsulation of Queue Invariants): self-contained Queue sorting via QueueEntry value objects**
+
+- **Context:** Currently, `Queue.add_candidate()` requires an injected parameter `candidates_map: dict[str, Candidate]` to access candidate registration timestamps and sort candidate IDs chronologically. This violates aggregate boundary isolation and creates high coupling by injecting repository-like collections into the domain aggregate root.
+- **Decision:** Remodel the relationship so that `Queue` maintains its chronological FIFO ordering invariants internally. Instead of storing raw string IDs, `Queue` will store a list of `QueueEntry` Value Objects, where each `QueueEntry` contains both the `candidate_id` and the `registered_at` timestamp. The `add_candidate` method signature will be refactored to `add_candidate(candidate_id: str, registered_at: str)`.
+- **Rationale:** By wrapping the required sorting data in a local Value Object (`QueueEntry`), the `Queue` aggregate root remains self-sufficient and fully protects its internal ordering invariants. It respects the DDD rule of reference-by-ID for cross-aggregate associations (since `Candidate` and `Queue` are distinct aggregate roots) while completely eliminating external parameters/map injection, ensuring clean domain boundaries and loose coupling.
 
 ## **🏛️ 14. Code Governance & Naming Standards**
 

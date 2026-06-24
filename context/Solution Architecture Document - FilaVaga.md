@@ -62,7 +62,8 @@
 - **Decoupling Content/Configuration from Code:** System behaviors, category lists, maximum wait times, and CLI default profiles are loaded from a localized JSON file (`config.json`), permitting behavioral customization without script re-compilation.
 - **Human-in-the-Loop (HITL) Validation:** The system generates priority match recommendations; the counselor explicitly inputs structural actions (e.g., `accept`, `decline`, `no-answer`) to transition candidate state, ensuring actual human counseling agency guides the platform.
 - **Offline-Resilience / Caching Policy:** FilaVaga is 100% offline-first. Session memory is designed to be highly secure and transient, preserving absolute execution integrity without remote database connectivity.
-- **Privacy-First Data Protection:** Candidate names are stored alongside localized obfuscated IDs. High-risk personal identifiers (like Brazilian CPF or physical addresses) are excluded from the runtime memory footprint by design.
+- **Privacy-First Data Protection & OS-level Security:** Candidate names are stored alongside localized obfuscated IDs. High-risk personal identifiers (like Brazilian CPF or physical addresses) are excluded from the runtime memory footprint by design. To prevent unauthorized local access to the plain-text snapshot database file, the application enforces restricted file permissions (POSIX `0600` / Windows DACLs) at creation, ensuring only the owner user can read/write the data. Physical encryption at rest is delegated to operating system-level full-disk encryption (LUKS/BitLocker) governed by institutional IT security policies, avoiding reverse-engineerable hardcoded keys within the application.
+
 
 ### **✍️ Technology & Data Governance Spec**
 

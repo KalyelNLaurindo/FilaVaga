@@ -2,7 +2,7 @@ import os
 import pytest
 import threading
 import json
-from filavaga.core.entities import Candidate, Vacancy, Queue
+from filavaga.core.entities import Candidate, Vacancy, Queue, QueueEntry
 
 def test_atomic_json_repository_crud(tmp_path):
     """Verify that AtomicJsonRepository can save and retrieve candidates, vacancies and queues correctly."""
@@ -33,7 +33,7 @@ def test_atomic_json_repository_crud(tmp_path):
     assert repo.get_all_vacancies() == {"v_1": vacancy}
 
     # 3. Queue CRUD
-    queue = Queue(profession_code="4110-10", candidate_ids=["c_1"])
+    queue = Queue(profession_code="4110-10", entries=[QueueEntry(candidate_id="c_1", registered_at="2026-06-15T08:00:00Z")])
     repo.save_queue(queue)
     assert repo.get_queue("4110-10") == queue
     assert repo.get_queue("7152-10") is None
@@ -110,7 +110,7 @@ def test_system_clock_override_and_mocking():
 def test_argparse_cli_adapter_register(tmp_path, capsys):
     """Verify that ArgparseCLIAdapter routes register commands and prints output."""
     from filavaga.infra.cli.command_router import ArgparseCLIAdapter
-    from filavaga.infra.persistence.atomic_json import AtomicJsonRepository
+    from filavaga.infra.persistence.atomic_json import AtomicJsonRepository, JsonUnitOfWork
     from filavaga.infra.persistence.system_clock import SystemClock
     from filavaga.application.services.queue_manager import QueueManager
     from datetime import datetime, timezone
@@ -118,7 +118,7 @@ def test_argparse_cli_adapter_register(tmp_path, capsys):
     db_file = tmp_path / "state_snapshot.json"
     repo = AtomicJsonRepository(str(db_file))
     clock = SystemClock(override_time=datetime(2026, 6, 15, 12, 0, 0, tzinfo=timezone.utc))
-    manager = QueueManager(repo, clock)
+    manager = QueueManager(JsonUnitOfWork(repo), clock)
     
     adapter = ArgparseCLIAdapter(register_usecase=manager, match_usecase=None)
     
@@ -142,7 +142,7 @@ def test_argparse_cli_adapter_register(tmp_path, capsys):
 def test_argparse_cli_adapter_match(tmp_path, capsys):
     """Verify that ArgparseCLIAdapter routes match commands and prints output."""
     from filavaga.infra.cli.command_router import ArgparseCLIAdapter
-    from filavaga.infra.persistence.atomic_json import AtomicJsonRepository
+    from filavaga.infra.persistence.atomic_json import AtomicJsonRepository, JsonUnitOfWork
     from filavaga.infra.persistence.system_clock import SystemClock
     from filavaga.application.services.match_engine import MatchEngine
     from filavaga.core.entities import Candidate, Vacancy, Queue
@@ -151,7 +151,7 @@ def test_argparse_cli_adapter_match(tmp_path, capsys):
     db_file = tmp_path / "state_snapshot.json"
     repo = AtomicJsonRepository(str(db_file))
     clock = SystemClock(override_time=datetime(2026, 6, 15, 12, 0, 0, tzinfo=timezone.utc))
-    engine = MatchEngine(repo, clock)
+    engine = MatchEngine(JsonUnitOfWork(repo), clock)
     
     # Setup state
     vacancy = Vacancy(
@@ -168,7 +168,7 @@ def test_argparse_cli_adapter_match(tmp_path, capsys):
     )
     repo.save_candidate(c_a)
     
-    queue = Queue(profession_code="4110-10", candidate_ids=["c_a"])
+    queue = Queue(profession_code="4110-10", entries=[QueueEntry(candidate_id="c_a", registered_at="2026-06-15T08:00:00Z")])
     repo.save_queue(queue)
     
     adapter = ArgparseCLIAdapter(register_usecase=None, match_usecase=engine)
@@ -204,10 +204,12 @@ def test_presenter_layouts():
     """Verify that RichConsolePresenter renders candidate registration, matches, and errors correctly."""
     from filavaga.infra.cli.presenter import RichConsolePresenter
     from filavaga.core.entities import Candidate
+    from filavaga.infra.translation import TranslationService
     from rich.console import Console
     
     console = Console(record=True, width=80)
-    presenter = RichConsolePresenter(console=console)
+    service = TranslationService(default_lang="en")
+    presenter = RichConsolePresenter(console=console, translation_service=service)
     
     # 1. Test candidate registration rendering
     candidate = Candidate(
@@ -264,7 +266,7 @@ def test_presenter_dashboard():
         )
     }
     queues = {
-        "4110-10": Queue(profession_code="4110-10", candidate_ids=["c_1"])
+        "4110-10": Queue(profession_code="4110-10", entries=[QueueEntry(candidate_id="c_1", registered_at="2026-06-15T08:00:00Z")])
     }
     
     presenter.display_dashboard(candidates, vacancies, queues)
@@ -451,6 +453,205 @@ def test_argparse_cli_adapter_purge_all(tmp_path, capsys):
     
     captured = capsys.readouterr()
     assert "Success" in captured.out or "Purge" in captured.out
+
+
+def test_atomic_json_repository_secure_permissions_posix(tmp_path):
+    """Verify that AtomicJsonRepository enforces POSIX 0700/0600 folder/file permissions."""
+    import sys
+    if sys.platform == "win32":
+        pytest.skip("POSIX permissions test skipped on Windows")
+        
+    from filavaga.infra.persistence.atomic_json import AtomicJsonRepository
+    from filavaga.core.entities import Candidate
+    import stat
+    
+    db_dir = tmp_path / "subdir"
+    db_file = db_dir / "state_snapshot.json"
+    
+    repo = AtomicJsonRepository(str(db_file))
+    candidate = Candidate(
+        id="c_1", name="Maria Silva", sector_zone="SUL",
+        profession_code="4110-10", registered_at="2026-06-15T08:00:00Z"
+    )
+    repo.save_candidate(candidate)
+    
+    # Verify directory has 0700
+    dir_mode = os.stat(str(db_dir)).st_mode
+    assert stat.S_IMODE(dir_mode) == 0o700
+    
+    # Verify database file has 0600
+    file_mode = os.stat(str(db_file)).st_mode
+    assert stat.S_IMODE(file_mode) == 0o600
+    
+    # Save again to trigger backup creation
+    repo.save_candidate(candidate)
+    
+    bak_file = db_dir / "state_snapshot.json.bak"
+    assert os.path.exists(bak_file)
+    bak_mode = os.stat(str(bak_file)).st_mode
+    assert stat.S_IMODE(bak_mode) == 0o600
+
+
+def test_atomic_json_repository_secure_permissions_windows(tmp_path):
+    """Verify that AtomicJsonRepository restricts Windows DACLs to current user and SYSTEM."""
+    import sys
+    if sys.platform != "win32":
+        pytest.skip("Windows permissions test skipped on POSIX")
+        
+    from filavaga.infra.persistence.atomic_json import AtomicJsonRepository
+    from filavaga.core.entities import Candidate
+    import subprocess
+    import getpass
+    
+    db_dir = tmp_path / "subdir"
+    db_file = db_dir / "state_snapshot.json"
+    
+    repo = AtomicJsonRepository(str(db_file))
+    candidate = Candidate(
+        id="c_1", name="Maria Silva", sector_zone="SUL",
+        profession_code="4110-10", registered_at="2026-06-15T08:00:00Z"
+    )
+    repo.save_candidate(candidate)
+    repo.save_candidate(candidate)  # Trigger backup file
+    
+    # Let's inspect permissions using icacls
+    # We check that icacls output on db_file does not contain "Users" or "Everyone" or "(I)"
+    result = subprocess.run(["icacls", str(db_file)], capture_output=True, text=True, check=True)
+    output = result.stdout
+    
+    # Verify inheritance is disabled (no (I) flag in any access control entries)
+    assert "(I)" not in output
+    
+    # Also verify that SYSTEM or current user is explicitly granted access
+    username = getpass.getuser()
+    assert username.lower() in output.lower() or os.environ.get("USERNAME", "").lower() in output.lower()
+    
+    # Check directory as well
+    dir_result = subprocess.run(["icacls", str(db_dir)], capture_output=True, text=True, check=True)
+    dir_output = dir_result.stdout
+    assert "(I)" not in dir_output
+
+
+def test_atomic_json_repository_mutability_protection(tmp_path):
+    """Verify that AtomicJsonRepository protects against reference leaks and state mutation."""
+    from filavaga.infra.persistence.atomic_json import AtomicJsonRepository
+    from filavaga.core.entities import Candidate, Vacancy, Queue
+    
+    db_file = tmp_path / "state_snapshot.json"
+    repo = AtomicJsonRepository(str(db_file))
+    
+    # 1. Test Candidate Mutability Protection (Read Isolation)
+    candidate = Candidate(
+        id="c_1", name="Maria Silva", sector_zone="SUL",
+        profession_code="4110-10", registered_at="2026-06-15T08:00:00Z"
+    )
+    repo.save_candidate(candidate)
+    
+    retrieved_candidate = repo.get_candidate("c_1")
+    # Mutate the returned candidate directly (without saving)
+    retrieved_candidate.name = "Modified Name"
+    
+    # Retrieving it again should return the original name
+    assert repo.get_candidate("c_1").name == "Maria Silva"
+    
+    # 2. Test Candidate Mutability Protection (Write Isolation)
+    candidate.name = "Another Name"
+    repo.save_candidate(candidate)
+    # Mutate original candidate object after save
+    candidate.name = "Mutated After Save"
+    assert repo.get_candidate("c_1").name == "Another Name"
+    
+    # 3. Test get_all_candidates isolation
+    all_candidates = repo.get_all_candidates()
+    all_candidates["c_1"].name = "Mutated in dict"
+    assert repo.get_candidate("c_1").name == "Another Name"
+
+    # 4. Test Vacancy Mutability Protection (Read & Write Isolation)
+    vacancy = Vacancy(
+        id="v_1", title="Auxiliar", profession_code="4110-10",
+        sector_zone="SUL", capacity=2, created_at="2026-06-15T10:00:00Z",
+        expires_at="2026-06-16T10:00:00Z"
+    )
+    repo.save_vacancy(vacancy)
+    retrieved_vacancy = repo.get_vacancy("v_1")
+    retrieved_vacancy.capacity = 10
+    assert repo.get_vacancy("v_1").capacity == 2
+    
+    vacancy.capacity = 5
+    repo.save_vacancy(vacancy)
+    vacancy.capacity = 20
+    assert repo.get_vacancy("v_1").capacity == 5
+    
+    # 5. Test Queue Mutability Protection (Read & Write Isolation)
+    queue = Queue(profession_code="4110-10", entries=[QueueEntry(candidate_id="c_1", registered_at="2026-06-15T08:00:00Z")])
+    repo.save_queue(queue)
+    retrieved_queue = repo.get_queue("4110-10")
+    retrieved_queue.entries.append(QueueEntry(candidate_id="c_2", registered_at="2026-06-15T08:30:00Z"))
+    assert repo.get_queue("4110-10").candidate_ids == ["c_1"]
+    
+    queue.add_candidate("c_3", "2026-06-15T09:00:00Z")
+    repo.save_queue(queue)
+    queue.add_candidate("c_4", "2026-06-15T10:00:00Z")
+    assert repo.get_queue("4110-10").candidate_ids == ["c_1", "c_3"]
+
+
+def test_json_unit_of_work_commit_and_rollback(tmp_path):
+    """Verify that JsonUnitOfWork commits changes successfully and rolls back on exceptions."""
+    from filavaga.infra.persistence.atomic_json import AtomicJsonRepository, JsonUnitOfWork
+    from filavaga.core.entities import Candidate
+    import os
+    
+    db_file = tmp_path / "state_snapshot.json"
+    repo = AtomicJsonRepository(str(db_file))
+    uow = JsonUnitOfWork(repo)
+    
+    candidate = Candidate(
+        id="c_1", name="Maria Silva", sector_zone="SUL",
+        profession_code="4110-10", registered_at="2026-06-15T08:00:00Z"
+    )
+    
+    # 1. Test Rollback on Exception
+    try:
+        with uow:
+            uow.repository.save_candidate(candidate)
+            assert uow.repository.get_candidate("c_1") == candidate
+            raise ValueError("Simulated error to trigger rollback")
+    except ValueError:
+        pass
+        
+    # The candidate must have been rolled back from repository memory cache
+    assert repo.get_candidate("c_1") is None
+    # No file must have been written to disk
+    assert not os.path.exists(db_file)
+    
+    # 2. Test Success Commit
+    with uow:
+        uow.repository.save_candidate(candidate)
+        uow.commit()
+        
+    # The candidate is saved in memory
+    assert repo.get_candidate("c_1") == candidate
+    # File is written to disk
+    assert os.path.exists(db_file)
+    
+    # 3. Verify read consistency after rollback
+    candidate2 = Candidate(
+        id="c_2", name="Joao Silva", sector_zone="SUL",
+        profession_code="4110-10", registered_at="2026-06-15T08:00:00Z"
+    )
+    try:
+        with uow:
+            uow.repository.save_candidate(candidate2)
+            raise ValueError("Rollback c_2")
+    except ValueError:
+        pass
+        
+    # c_1 still exists, c_2 does not
+    assert repo.get_candidate("c_1") == candidate
+    assert repo.get_candidate("c_2") is None
+
+
+
 
 
 

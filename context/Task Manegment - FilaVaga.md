@@ -147,6 +147,69 @@ Tasks are mapped bottom-up matching the hexagonal boundaries and dependencies.
   - _TDD Test File:_ `tests/test_infra.py`
   - _Status:_ Done
 
+- [**TSK-26**](backlog/TSK-26.md)**: File-System Access Permission Hardening**
+  - _Epic/Requirement Link:_ NFR03 / SECURITY
+  - _Metrics:_ Reach: 90 | Impact: 2.5 | Confidence: 0.9 | Effort: 1 (1 SP)
+  - _RICE Score:_ 202.5
+  - _TDD Test File:_ `tests/test_infra.py`
+  - _Status:_ Done
+
+### **🔒 Backlog Phase 5.1: Security Hardening & Encapsulation**
+
+- [**TSK-27**](backlog/TSK-27.md)**: Repository Reference Leak & Mutability Protection**
+  - _Epic/Requirement Link:_ NFR04 / Data Integrity / State Consistency
+  - _Metrics:_ Reach: 100 | Impact: 3.0 | Confidence: 1.0 | Effort: 1 (1 SP)
+  - _RICE Score:_ 300.0 (High Priority Compliance)
+  - _TDD Test File:_ `tests/test_infra.py`
+  - _Status:_ Done
+
+- [**TSK-32**](backlog/TSK-32.md)**: Implement Unit of Work (UoW) Pattern for Multi-Repository Atomic Transactions**
+  - _Epic/Requirement Link:_ NFR04 / DATA INTEGRITY
+  - _Metrics:_ Reach: 100 | Impact: 3.0 | Confidence: 1.0 | Effort: 2 (2 SP)
+  - _RICE Score:_ 150.0
+  - _TDD Test File:_ `tests/test_infra.py`
+  - _Status:_ Done
+
+- [**TSK-33**](backlog/TSK-33.md)**: Refactor Queue Aggregate for DDD Orthodox Self-Sufficiency**
+  - _Epic/Requirement Link:_ RF01 / Domain Modeling
+  - _Metrics:_ Reach: 95 | Impact: 3.0 | Confidence: 1.0 | Effort: 1 (1 SP)
+  - _RICE Score:_ 285.0
+  - _TDD Test File:_ `tests/test_domain.py`
+  - _Status:_ Done
+
+### **🌐 Backlog Phase 5.2: Internationalization (i18n) & Localized UI**
+
+- [**TSK-28**](backlog/TSK-28.md)**: i18n Translation Engine & Language Configuration Loader**
+  - _Epic/Requirement Link:_ NFR05 / ACCESSIBILITY & DX
+  - _Metrics:_ Reach: 90 | Impact: 2.0 | Confidence: 0.8 | Effort: 2 (2 SP)
+  - _RICE Score:_ 72.0
+  - _TDD Test File:_ `tests/test_infra.py`
+  - _Status:_ To Do
+
+- [**TSK-29**](backlog/TSK-29.md)**: UI RichConsolePresenter Key-based Translation Mapping**
+  - _Epic/Requirement Link:_ NFR05 / ACCESSIBILITY & DX
+  - _Metrics:_ Reach: 90 | Impact: 2.0 | Confidence: 0.8 | Effort: 2 (2 SP)
+  - _RICE Score:_ 72.0
+  - _TDD Test File:_ `tests/test_infra.py`
+  - _Status:_ To Do
+
+### **🎨 Backlog Phase 5.3: Console Accessibility & Interactive UX**
+
+- [**TSK-30**](backlog/TSK-30.md)**: Interactive Shortcuts & Layperson Menu Enhancements**
+  - _Epic/Requirement Link:_ NFR05 / ACCESSIBILITY & UX
+  - _Metrics:_ Reach: 95 | Impact: 2.5 | Confidence: 0.9 | Effort: 1 (1 SP)
+  - _RICE Score:_ 213.75
+  - _TDD Test File:_ `tests/test_infra.py`
+  - _Status:_ To Do
+
+- [**TSK-31**](backlog/TSK-31.md)**: CLI Accessibility Suite (Support for --no-color and Screen-Reader Linearization)**
+  - _Epic/Requirement Link:_ NFR05 / ACCESSIBILITY
+  - _Metrics:_ Reach: 95 | Impact: 3.0 | Confidence: 1.0 | Effort: 1 (1 SP)
+  - _RICE Score:_ 285.0
+  - _TDD Test File:_ `tests/test_infra.py`
+  - _Status:_ To Do
+
+
 ### **📦 Backlog Phase 6: Packaging & CI/CD Release**
 
 - [**TSK-17**](backlog/TSK-17.md)**: PyProject Configuration & PyInstaller Standalone Compilation**
@@ -218,12 +281,19 @@ Tasks are mapped bottom-up matching the hexagonal boundaries and dependencies.
 - [ ] [**TSK-19**](backlog/TSK-19.md)**:** Historical Archiving & Snapshot Optimization (2 SP)
 - [ ] [**TSK-20**](backlog/TSK-20.md)**:** Interactive Configuration Wizard (2 SP)
 - [ ] [**TSK-21**](backlog/TSK-21.md)**:** Anonymized Placement Analytics Export (2 SP)
+- [ ] [**TSK-28**](backlog/TSK-28.md)**:** i18n Translation Engine & Language Configuration Loader (2 SP)
+- [ ] [**TSK-29**](backlog/TSK-29.md)**:** UI RichConsolePresenter Key-based Translation Mapping (2 SP)
+- [ ] [**TSK-30**](backlog/TSK-30.md)**:** Interactive Shortcuts & Layperson Menu Enhancements (1 SP)
+- [ ] [**TSK-31**](backlog/TSK-31.md)**:** CLI Accessibility Suite (Support for --no-color and Screen-Reader Linearization) (1 SP)
+
 
 **Phase 8 — Integração & Extensibilidade da Plataforma**
 - [ ] [**TSK-22**](backlog/TSK-22.md)**:** REST-like In-Process Event Bus (4 SP)
 - [ ] [**TSK-23**](backlog/TSK-23.md)**:** Vacancy Capacity Overflow Alerting (1 SP)
 - [ ] [**TSK-24**](backlog/TSK-24.md)**:** Candidate Profile Schema Validator (2 SP)
 - [ ] [**TSK-25**](backlog/TSK-25.md)**:** Queue Snapshot Serializer & Replay (4 SP)
+- [ ] [**TSK-34**](backlog/TSK-34.md)**:** HTTP REST API Backend Server Integration (3 SP)
+
 
 
 ### **🟡 In Progress (Actively Being Built)**
@@ -253,5 +323,9 @@ _None._
 - [x] [**TSK-15**](backlog/TSK-15.md)**:** Self-Healing JSON Schema Validator & Backup Recovery (2 SP)
 - [x] [**TSK-16**](backlog/TSK-16.md)**:** LGPD-Compliant "purge-all" Safe Data Scrubber (1 SP)
 - [x] [**TSK-17**](backlog/TSK-17.md)**:** PyProject Configuration & PyInstaller Standalone Compilation (2 SP)
+- [x] [**TSK-26**](backlog/TSK-26.md)**:** File-System Access Permission Hardening (1 SP)
+- [x] [**TSK-27**](backlog/TSK-27.md)**:** Repository Reference Leak & Mutability Protection (1 SP)
+- [x] [**TSK-32**](backlog/TSK-32.md)**:** Implement Unit of Work (UoW) Pattern for Multi-Repository Atomic Transactions (2 SP)
+- [x] [**TSK-33**](backlog/TSK-33.md)**:** Refactor Queue Aggregate for DDD Orthodox Self-Sufficiency (1 SP)
 
 _Signed by:_ Kalyel N. Laurindo / Project Owner

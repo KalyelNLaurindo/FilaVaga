@@ -5,7 +5,7 @@ a = Analysis(
     ['filavaga\\main.py'],
     pathex=[],
     binaries=[],
-    datas=[],
+    datas=[('filavaga/locales', 'filavaga/locales')],
     hiddenimports=[],
     hookspath=[],
     hooksconfig={},

@@ -8,12 +8,15 @@ Author: Kalyel N. Laurindo / Software Engineer
 
 import os
 from filavaga.infra.persistence.system_clock import SystemClock
-from filavaga.infra.persistence.atomic_json import AtomicJsonRepository
+from filavaga.infra.persistence.atomic_json import AtomicJsonRepository, JsonUnitOfWork
 from filavaga.application.services.queue_manager import QueueManager
 from filavaga.application.services.match_engine import MatchEngine
 from filavaga.infra.cli.command_router import ArgparseCLIAdapter
 from filavaga.infra.cli.presenter import RichConsolePresenter
 from filavaga.infra.logger import configure_logging
+
+
+from filavaga.infra.translation import TranslationService
 
 
 def main():
@@ -30,20 +33,24 @@ def main():
     # 2. Instantiate Outbound Adapters
     clock = SystemClock()
     repository = AtomicJsonRepository(db_path)
+    uow = JsonUnitOfWork(repository)
+    translation_service = TranslationService()
     presenter = RichConsolePresenter()
     
     # 3. Instantiate Core Services (Inbound Ports implementation)
-    queue_manager = QueueManager(repository, clock)
-    match_engine = MatchEngine(repository, clock)
+    queue_manager = QueueManager(uow, clock)
+    match_engine = MatchEngine(uow, clock)
     
     # 4. Instantiate CLI Adapter (Inbound controller) and run
     cli_adapter = ArgparseCLIAdapter(
         register_usecase=queue_manager,
         match_usecase=match_engine,
         presenter=presenter,
-        repository=repository
+        repository=repository,
+        translation_service=translation_service
     )
     cli_adapter.run()
+
 
 
 if __name__ == "__main__":

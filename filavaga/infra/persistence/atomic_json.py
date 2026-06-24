@@ -12,8 +12,9 @@ import json
 import shutil
 import threading
 import logging
-from filavaga.application.ports.outbound import IStateRepository
-from filavaga.core.entities import Candidate, Vacancy, Queue
+import copy
+from filavaga.application.ports.outbound import IStateRepository, IUnitOfWork
+from filavaga.core.entities import Candidate, Vacancy, Queue, QueueEntry
 
 logger = logging.getLogger("filavaga")
 
@@ -28,11 +29,63 @@ class AtomicJsonRepository(IStateRepository):
 
     def __init__(self, filepath: str):
         self._filepath = os.path.abspath(filepath)
-        self._lock = threading.Lock()
+        self._lock = threading.RLock()
         self._candidates = {}
         self._vacancies = {}
         self._queues = {}
+        self._in_transaction = False
+        
+        # Ensure parent directory exists and apply secure permissions
+        parent_dir = os.path.dirname(self._filepath)
+        if parent_dir:
+            os.makedirs(parent_dir, exist_ok=True)
+            self._apply_secure_permissions(parent_dir, is_dir=True)
+            
         self._load_state_from_disk()
+
+    def _apply_secure_permissions(self, path: str, is_dir: bool = False) -> None:
+        """
+        Enforce strict file-system access control lists/permissions on both POSIX and Windows.
+        POSIX: 0700 for directories, 0600 for files.
+        Windows: Disable inheritance and grant Full Control only to current user and SYSTEM.
+        """
+        if not os.path.exists(path):
+            return
+
+        if os.name != "nt":
+            # POSIX permission hardening
+            mode = 0o700 if is_dir else 0o600
+            try:
+                os.chmod(path, mode)
+            except Exception as e:
+                logger.warning("Failed to apply POSIX permissions on %s: %s", path, e)
+        else:
+            # Windows security hardening (using native icacls utility)
+            import subprocess
+            import getpass
+            try:
+                # 1. Disable inheritance and remove all inherited ACEs
+                subprocess.run(
+                    ["icacls", path, "/inheritance:r"],
+                    capture_output=True, check=True, text=True
+                )
+                
+                # 2. Grant Full Control (F) to SYSTEM (S-1-5-18)
+                inherit_flag = "(OI)(CI)" if is_dir else ""
+                subprocess.run(
+                    ["icacls", path, "/grant:r", f"*S-1-5-18:{inherit_flag}F"],
+                    capture_output=True, check=True, text=True
+                )
+                
+                # 3. Grant Full Control (F) to the current user
+                username = getpass.getuser()
+                subprocess.run(
+                    ["icacls", path, "/grant:r", f"{username}:{inherit_flag}F"],
+                    capture_output=True, check=True, text=True
+                )
+            except Exception as e:
+                logger.warning("Failed to apply Windows DACL permissions on %s: %s", path, e)
+
 
     @property
     def filepath(self) -> str:
@@ -43,38 +96,44 @@ class AtomicJsonRepository(IStateRepository):
 
     def get_candidate(self, candidate_id: str) -> Candidate | None:
         with self._lock:
-            return self._candidates.get(candidate_id)
+            candidate = self._candidates.get(candidate_id)
+            return copy.deepcopy(candidate) if candidate else None
 
     def save_candidate(self, candidate: Candidate) -> None:
         with self._lock:
-            self._candidates[candidate.id] = candidate
-            self._save_state_to_disk()
+            self._candidates[candidate.id] = copy.deepcopy(candidate)
+            if not self._in_transaction:
+                self._save_state_to_disk()
 
     def get_all_candidates(self) -> dict[str, Candidate]:
         with self._lock:
-            return dict(self._candidates)
+            return {c_id: copy.deepcopy(c) for c_id, c in self._candidates.items()}
 
     def get_vacancy(self, vacancy_id: str) -> Vacancy | None:
         with self._lock:
-            return self._vacancies.get(vacancy_id)
+            vacancy = self._vacancies.get(vacancy_id)
+            return copy.deepcopy(vacancy) if vacancy else None
 
     def save_vacancy(self, vacancy: Vacancy) -> None:
         with self._lock:
-            self._vacancies[vacancy.id] = vacancy
-            self._save_state_to_disk()
+            self._vacancies[vacancy.id] = copy.deepcopy(vacancy)
+            if not self._in_transaction:
+                self._save_state_to_disk()
 
     def get_all_vacancies(self) -> dict[str, Vacancy]:
         with self._lock:
-            return dict(self._vacancies)
+            return {v_id: copy.deepcopy(v) for v_id, v in self._vacancies.items()}
 
     def get_queue(self, profession_code: str) -> Queue | None:
         with self._lock:
-            return self._queues.get(profession_code)
+            queue = self._queues.get(profession_code)
+            return copy.deepcopy(queue) if queue else None
 
     def save_queue(self, queue: Queue) -> None:
         with self._lock:
-            self._queues[queue.profession_code] = queue
-            self._save_state_to_disk()
+            self._queues[queue.profession_code] = copy.deepcopy(queue)
+            if not self._in_transaction:
+                self._save_state_to_disk()
 
     def _load_state_from_disk(self) -> None:
         """Read snapshot from disk, validate its schema and rebuild domain objects in memory."""
@@ -121,9 +180,14 @@ class AtomicJsonRepository(IStateRepository):
 
             queues_data = data.get("queues", {})
             for q_code, q_val in queues_data.items():
+                entries = []
+                for c_id in q_val.get("candidate_ids", []):
+                    c_obj = self._candidates.get(c_id)
+                    if c_obj:
+                        entries.append(QueueEntry(candidate_id=c_id, registered_at=c_obj.registered_at))
                 self._queues[q_code] = Queue(
                     profession_code=q_val["profession_code"],
-                    candidate_ids=q_val.get("candidate_ids", [])
+                    entries=entries
                 )
             logger.info("Successfully loaded state snapshot from disk.")
         except Exception as e:
@@ -136,6 +200,7 @@ class AtomicJsonRepository(IStateRepository):
                     if os.path.exists(err_path):
                         os.remove(err_path)
                     os.rename(self._filepath, err_path)
+                    self._apply_secure_permissions(err_path, is_dir=False)
             except Exception as isolation_err:
                 logger.error("Failed to isolate corrupted file to %s. Error: %s", err_path, isolation_err)
                 
@@ -145,6 +210,7 @@ class AtomicJsonRepository(IStateRepository):
                 try:
                     logger.info("Restoring backup from %s.", bak_path)
                     shutil.copy2(bak_path, self._filepath)
+                    self._apply_secure_permissions(self._filepath, is_dir=False)
                     self._load_state_from_disk()
                 except Exception as ex:
                     logger.error("Failed to restore backup snapshot. Error: %s. Resetting to empty state.", ex)
@@ -163,6 +229,7 @@ class AtomicJsonRepository(IStateRepository):
         parent_dir = os.path.dirname(self._filepath)
         if parent_dir:
             os.makedirs(parent_dir, exist_ok=True)
+            self._apply_secure_permissions(parent_dir, is_dir=True)
 
         # Build payload dicts
         candidates_json = {
@@ -218,14 +285,69 @@ class AtomicJsonRepository(IStateRepository):
             with open(tmp_path, "w", encoding="utf-8") as f:
                 json.dump(payload, f, indent=2, ensure_ascii=False)
 
+            # Apply secure permissions to temporary file
+            self._apply_secure_permissions(tmp_path, is_dir=False)
+
             # 2. Backup the old active file if it exists
             if os.path.exists(self._filepath):
                 logger.debug("Backing up active snapshot file to %s.", bak_path)
                 shutil.copy2(self._filepath, bak_path)
+                self._apply_secure_permissions(bak_path, is_dir=False)
 
             # 3. Perform OS atomic replace (rename staging to active)
             os.replace(tmp_path, self._filepath)
+            self._apply_secure_permissions(self._filepath, is_dir=False)
             logger.info("Successfully saved state snapshot atomically to %s.", self._filepath)
         except Exception as e:
             logger.error("Failed to save state snapshot to disk. Error: %s", e)
             raise
+
+
+class JsonUnitOfWork(IUnitOfWork):
+    """
+    Concrete implementation of Unit of Work for Json persistence.
+    
+    Guarantees that state changes are kept in memory and only written
+    to disk upon successful completion and explicit commit().
+    """
+
+    def __init__(self, repository: AtomicJsonRepository):
+        self._repository = repository
+        self._committed = False
+        self._snapshot = None
+
+    def __enter__(self) -> 'JsonUnitOfWork':
+        self._repository._lock.acquire()
+        # Take deepcopy snapshot of caches
+        self._snapshot = (
+            copy.deepcopy(self._repository._candidates),
+            copy.deepcopy(self._repository._vacancies),
+            copy.deepcopy(self._repository._queues)
+        )
+        self._repository._in_transaction = True
+        self._committed = False
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb) -> None:
+        try:
+            if exc_type is not None or not self._committed:
+                self.rollback()
+        finally:
+            self._repository._in_transaction = False
+            self._snapshot = None
+            self._repository._lock.release()
+
+    def commit(self) -> None:
+        self._repository._save_state_to_disk()
+        self._committed = True
+
+    def rollback(self) -> None:
+        if self._snapshot:
+            self._repository._candidates = self._snapshot[0]
+            self._repository._vacancies = self._snapshot[1]
+            self._repository._queues = self._snapshot[2]
+
+    @property
+    def repository(self) -> IStateRepository:
+        return self._repository
+

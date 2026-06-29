@@ -11,12 +11,12 @@ Implement an interactive setup wizard using the console terminal CLI. Instead of
 
 ## ✅ Definition of Ready (DoR)
 
-* [ ] `Rich` library console input prompt API reviewed for compatibility.
-* [ ] Validation constraints for configuration keys (e.g. valid path structures, positive TTL values) defined in code.
+* [x] `Rich` library console input prompt API reviewed for compatibility.
+* [x] Validation constraints for configuration keys (e.g. valid path structures, positive TTL values) defined in code.
 
 ## 🏁 Definition of Done (DoD) & Acceptance Criteria
 
-* [ ] Implement CLI command route: `filavaga config-wizard`.
-* [ ] The wizard prompts for values sequentially, displaying existing defaults and validating entries in real-time.
-* [ ] The new parameters are saved atomically to `config.json` upon completion of the wizard flow.
-* [ ] Interruption (Ctrl+C) during the wizard cancels gracefully without writing a corrupt or partial configuration.
+* [x] Implement CLI command route: `filavaga config-wizard`.
+* [x] The wizard prompts for values sequentially, displaying existing defaults and validating entries in real-time.
+* [x] The new parameters are saved atomically to `config.json` upon completion of the wizard flow.
+* [x] Interruption (Ctrl+C) during the wizard cancels gracefully without writing a corrupt or partial configuration.

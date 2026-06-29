@@ -11,12 +11,12 @@ Develop an analytics module to calculate key performance and efficiency indicato
 
 ## ✅ Definition of Ready (DoR)
 
-* [ ] Formula and parameters for wait time and placement metrics aligned with SINE criteria.
-* [ ] Target CSV header schema defined.
+* [x] Formula and parameters for wait time and placement metrics aligned with SINE criteria.
+* [x] Target CSV header schema defined.
 
 ## 🏁 Definition of Done (DoD) & Acceptance Criteria
 
-* [ ] Implement CLI command route: `filavaga export-stats --output <csv_path>`.
-* [ ] The exported file contains aggregate tables categorized by sector zones and CBO codes.
-* [ ] No PII (names, specific timestamps, candidate IDs) is written to the output file.
-* [ ] Unit tests ensure that calculation edge cases (e.g. empty queues, instant matches) do not trigger divide-by-zero errors.
+* [x] Implement CLI command route: `filavaga export-stats --output <csv_path>`.
+* [x] The exported file contains aggregate tables categorized by sector zones and CBO codes.
+* [x] No PII (names, specific timestamps, candidate IDs) is written to the output file.
+* [x] Unit tests ensure that calculation edge cases (e.g. empty queues, instant matches) do not trigger divide-by-zero errors.

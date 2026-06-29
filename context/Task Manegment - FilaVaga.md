@@ -277,9 +277,6 @@ Tasks are mapped bottom-up matching the hexagonal boundaries and dependencies.
 
 ### **🔴 To Do (Ready for Development)**
 
-- [ ] [**TSK-21**](backlog/TSK-21.md)**:** Anonymized Placement Analytics Export (2 SP)
-
-
 **Phase 8 — Integração & Extensibilidade da Plataforma**
 - [ ] [**TSK-22**](backlog/TSK-22.md)**:** REST-like In-Process Event Bus (4 SP)
 - [ ] [**TSK-23**](backlog/TSK-23.md)**:** Vacancy Capacity Overflow Alerting (1 SP)
@@ -320,6 +317,7 @@ _None._
 - [x] [**TSK-18**](backlog/TSK-18.md)**:** CSV Data Import Adapter (2 SP)
 - [x] [**TSK-19**](backlog/TSK-19.md)**:** Historical Archiving & Snapshot Optimization (2 SP)
 - [x] [**TSK-20**](backlog/TSK-20.md)**:** Interactive Configuration Wizard (2 SP)
+- [x] [**TSK-21**](backlog/TSK-21.md)**:** Anonymized Placement Analytics Export (2 SP)
 - [x] [**TSK-26**](backlog/TSK-26.md)**:** File-System Access Permission Hardening (1 SP)
 - [x] [**TSK-27**](backlog/TSK-27.md)**:** Repository Reference Leak & Mutability Protection (1 SP)
 - [x] [**TSK-28**](backlog/TSK-28.md)**:** i18n Translation Engine & Language Configuration Loader (2 SP)

@@ -106,3 +106,16 @@ class IConfigWizardUseCase(ABC):
         Start the interactive terminal prompts flow and write atomic config updates.
         """
         pass
+
+
+class IExportStatsUseCase(ABC):
+    """
+    Interface for the anonymized placement stats analytics CSV export use case.
+    """
+
+    @abstractmethod
+    def export_stats(self, output_path: str) -> None:
+        """
+        Consolidate metrics by sector zone and CBO and write report to CSV path.
+        """
+        pass

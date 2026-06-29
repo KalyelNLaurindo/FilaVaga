@@ -86,6 +86,26 @@ class IStateRepository(ABC):
         """
         pass
 
+    @abstractmethod
+    def delete_candidate(self, candidate_id: str) -> None:
+        """
+        Permanently remove a candidate from active persistent storage.
+        """
+        pass
+
+
+class IArchiveRepository(ABC):
+    """
+    Interface for persistence of archived candidate records (outbound adapter port).
+    """
+
+    @abstractmethod
+    def save_archived_candidates(self, candidates: list[Candidate]) -> None:
+        """
+        Append list of archived candidates to the archive storage database.
+        """
+        pass
+
 
 class IUnitOfWork(ABC):
     """

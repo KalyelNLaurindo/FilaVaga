@@ -13,13 +13,13 @@ import shutil
 import threading
 import logging
 import copy
-from filavaga.application.ports.outbound import IStateRepository, IUnitOfWork
+from filavaga.application.ports.outbound import IStateRepository, IUnitOfWork, IArchiveRepository
 from filavaga.core.entities import Candidate, Vacancy, Queue, QueueEntry
 
 logger = logging.getLogger("filavaga")
 
 
-class AtomicJsonRepository(IStateRepository):
+class AtomicJsonRepository(IStateRepository, IArchiveRepository):
     """
     Local JSON file repository for atomic state mutations.
     
@@ -41,6 +41,7 @@ class AtomicJsonRepository(IStateRepository):
             os.makedirs(parent_dir, exist_ok=True)
             self._apply_secure_permissions(parent_dir, is_dir=True)
             
+        self._archive_filepath = os.path.join(parent_dir or ".", "archive_snapshot.json")
         self._load_state_from_disk()
 
     def _apply_secure_permissions(self, path: str, is_dir: bool = False) -> None:
@@ -301,6 +302,65 @@ class AtomicJsonRepository(IStateRepository):
         except Exception as e:
             logger.error("Failed to save state snapshot to disk. Error: %s", e)
             raise
+
+    def delete_candidate(self, candidate_id: str) -> None:
+        with self._lock:
+            if candidate_id in self._candidates:
+                del self._candidates[candidate_id]
+            if not self._in_transaction:
+                self._save_state_to_disk()
+
+    def save_archived_candidates(self, candidates: list[Candidate]) -> None:
+        with self._lock:
+            # 1. Load existing archived candidates if archive file exists
+            archived_data = {}
+            if os.path.exists(self._archive_filepath):
+                try:
+                    with open(self._archive_filepath, "r", encoding="utf-8") as f:
+                        data = json.load(f)
+                        archived_data = data.get("candidates", {})
+                except Exception as e:
+                    logger.warning("Archive snapshot file at %s is corrupted. Starting fresh. Error: %s", self._archive_filepath, e)
+
+            # 2. Add new candidates to the dict
+            for c in candidates:
+                archived_data[c.id] = {
+                    "id": c.id,
+                    "name": c.name,
+                    "sector_zone": c.sector_zone,
+                    "profession_code": c.profession_code,
+                    "registered_at": c.registered_at,
+                    "status": c.status
+                }
+
+            # 3. Write atomically to archive file
+            payload = {
+                "metadata": {
+                    "app_id": "filavaga-sine-local-archive",
+                    "schema_version": "1.0"
+                },
+                "candidates": archived_data
+            }
+
+            tmp_path = self._archive_filepath + ".tmp"
+            try:
+                # Ensure parent dir exists (it is same as filepath)
+                parent_dir = os.path.dirname(self._archive_filepath)
+                if parent_dir:
+                    os.makedirs(parent_dir, exist_ok=True)
+                    self._apply_secure_permissions(parent_dir, is_dir=True)
+
+                logger.debug("Writing temporary archive snapshot state to %s.", tmp_path)
+                with open(tmp_path, "w", encoding="utf-8") as f:
+                    json.dump(payload, f, indent=2, ensure_ascii=False)
+
+                self._apply_secure_permissions(tmp_path, is_dir=False)
+                os.replace(tmp_path, self._archive_filepath)
+                self._apply_secure_permissions(self._archive_filepath, is_dir=False)
+                logger.info("Successfully saved archived candidates atomically to %s.", self._archive_filepath)
+            except Exception as e:
+                logger.error("Failed to save archive snapshot to disk. Error: %s", e)
+                raise
 
 
 class JsonUnitOfWork(IUnitOfWork):

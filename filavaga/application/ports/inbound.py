@@ -73,3 +73,23 @@ class IImportCSVUseCase(ABC):
             A dictionary containing counts of imported entities, e.g. {"candidates": X, "vacancies": Y}
         """
         pass
+
+
+class IArchiveCandidatesUseCase(ABC):
+    """
+    Interface for the historical candidate archiving use case.
+    """
+
+    @abstractmethod
+    def archive_candidates(self, days: int) -> int:
+        """
+        Move candidates with status PLACED or REJECTED older than the specified days
+        from the active database to the archive.
+        
+        Args:
+            days: Threshold in days to consider candidates old.
+            
+        Returns:
+            The number of candidates successfully archived.
+        """
+        pass

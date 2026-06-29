@@ -20,7 +20,7 @@ This includes:
 
 ## 🏁 Definition of Done (DoD) & Acceptance Criteria
 
-* [ ] **[Testing/Quality - TDD]:** Unit tests verify that calling presenter methods returns equivalent layouts and translated texts for at least 3 distinct active locales.
-* [ ] **[Functional - Presenter]:** Zero hardcoded Portuguese/English words remain inside `RichConsolePresenter.py` codebase; all labels resolve via translation keys.
-* [ ] **[Functional - Table Alignment]:** Localized strings with differing character lengths do not break Rich table borders or vertical alignments.
-* [ ] **[Verification]:** `pytest tests/test_infra.py` passes 100% green.
+* [x] **[Testing/Quality - TDD]:** Unit tests verify that calling presenter methods returns equivalent layouts and translated texts for at least 3 distinct active locales.
+* [x] **[Functional - Presenter]:** Zero hardcoded Portuguese/English words remain inside `RichConsolePresenter.py` codebase; all labels resolve via translation keys.
+* [x] **[Functional - Table Alignment]:** Localized strings with differing character lengths do not break Rich table borders or vertical alignments.
+* [x] **[Verification]:** `pytest tests/test_infra.py` passes 100% green.

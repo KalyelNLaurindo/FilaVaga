@@ -20,7 +20,7 @@ Tasks:
 
 ## 🏁 Definition of Done (DoD) & Acceptance Criteria
 
-* [ ] **[Testing/Quality - TDD]:** Test cases verify that setting environment variable `NO_COLOR=1` or parameter `--no-color` results in stdout containing pure text with zero ANSI color escape characters.
-* [ ] **[Functional - Screen Reader]:** Provide a command-line flag `--linear` or `--accessible` that formats all output as a simple linear stream rather than box-drawing ASCII grids.
-* [ ] **[Functional - Contrast]:** Ensure high contrast compliance for default terminal output layouts.
-* [ ] **[Verification]:** `pytest tests/test_infra.py` passes 100% green.
+* [x] **[Testing/Quality - TDD]:** Test cases verify that setting environment variable `NO_COLOR=1` or parameter `--no-color` results in stdout containing pure text with zero ANSI color escape characters.
+* [x] **[Functional - Screen Reader]:** Provide a command-line flag `--linear` or `--accessible` that formats all output as a simple linear stream rather than box-drawing ASCII grids.
+* [x] **[Functional - Contrast]:** Ensure high contrast compliance for default terminal output layouts.
+* [x] **[Verification]:** `pytest tests/test_infra.py` passes 100% green.

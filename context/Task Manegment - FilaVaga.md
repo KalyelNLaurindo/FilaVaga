@@ -184,14 +184,14 @@ Tasks are mapped bottom-up matching the hexagonal boundaries and dependencies.
   - _Metrics:_ Reach: 90 | Impact: 2.0 | Confidence: 0.8 | Effort: 2 (2 SP)
   - _RICE Score:_ 72.0
   - _TDD Test File:_ `tests/test_infra.py`
-  - _Status:_ To Do
+  - _Status:_ Done
 
 - [**TSK-29**](backlog/TSK-29.md)**: UI RichConsolePresenter Key-based Translation Mapping**
   - _Epic/Requirement Link:_ NFR05 / ACCESSIBILITY & DX
   - _Metrics:_ Reach: 90 | Impact: 2.0 | Confidence: 0.8 | Effort: 2 (2 SP)
   - _RICE Score:_ 72.0
   - _TDD Test File:_ `tests/test_infra.py`
-  - _Status:_ To Do
+  - _Status:_ Done
 
 ### **🎨 Backlog Phase 5.3: Console Accessibility & Interactive UX**
 
@@ -200,14 +200,14 @@ Tasks are mapped bottom-up matching the hexagonal boundaries and dependencies.
   - _Metrics:_ Reach: 95 | Impact: 2.5 | Confidence: 0.9 | Effort: 1 (1 SP)
   - _RICE Score:_ 213.75
   - _TDD Test File:_ `tests/test_infra.py`
-  - _Status:_ To Do
+  - _Status:_ Done
 
 - [**TSK-31**](backlog/TSK-31.md)**: CLI Accessibility Suite (Support for --no-color and Screen-Reader Linearization)**
   - _Epic/Requirement Link:_ NFR05 / ACCESSIBILITY
   - _Metrics:_ Reach: 95 | Impact: 3.0 | Confidence: 1.0 | Effort: 1 (1 SP)
   - _RICE Score:_ 285.0
   - _TDD Test File:_ `tests/test_infra.py`
-  - _Status:_ To Do
+  - _Status:_ Done
 
 
 ### **📦 Backlog Phase 6: Packaging & CI/CD Release**
@@ -281,10 +281,6 @@ Tasks are mapped bottom-up matching the hexagonal boundaries and dependencies.
 - [ ] [**TSK-19**](backlog/TSK-19.md)**:** Historical Archiving & Snapshot Optimization (2 SP)
 - [ ] [**TSK-20**](backlog/TSK-20.md)**:** Interactive Configuration Wizard (2 SP)
 - [ ] [**TSK-21**](backlog/TSK-21.md)**:** Anonymized Placement Analytics Export (2 SP)
-- [ ] [**TSK-28**](backlog/TSK-28.md)**:** i18n Translation Engine & Language Configuration Loader (2 SP)
-- [ ] [**TSK-29**](backlog/TSK-29.md)**:** UI RichConsolePresenter Key-based Translation Mapping (2 SP)
-- [ ] [**TSK-30**](backlog/TSK-30.md)**:** Interactive Shortcuts & Layperson Menu Enhancements (1 SP)
-- [ ] [**TSK-31**](backlog/TSK-31.md)**:** CLI Accessibility Suite (Support for --no-color and Screen-Reader Linearization) (1 SP)
 
 
 **Phase 8 — Integração & Extensibilidade da Plataforma**
@@ -326,6 +322,10 @@ _None._
 - [x] [**TSK-17**](backlog/TSK-17.md)**:** PyProject Configuration & PyInstaller Standalone Compilation (2 SP)
 - [x] [**TSK-26**](backlog/TSK-26.md)**:** File-System Access Permission Hardening (1 SP)
 - [x] [**TSK-27**](backlog/TSK-27.md)**:** Repository Reference Leak & Mutability Protection (1 SP)
+- [x] [**TSK-28**](backlog/TSK-28.md)**:** i18n Translation Engine & Language Configuration Loader (2 SP)
+- [x] [**TSK-29**](backlog/TSK-29.md)**:** UI RichConsolePresenter Key-based Translation Mapping (2 SP)
+- [x] [**TSK-30**](backlog/TSK-30.md)**:** Interactive Shortcuts & Layperson Menu Enhancements (1 SP)
+- [x] [**TSK-31**](backlog/TSK-31.md)**:** CLI Accessibility Suite (Support for --no-color and Screen-Reader Linearization) (1 SP)
 - [x] [**TSK-32**](backlog/TSK-32.md)**:** Implement Unit of Work (UoW) Pattern for Multi-Repository Atomic Transactions (2 SP)
 - [x] [**TSK-33**](backlog/TSK-33.md)**:** Refactor Queue Aggregate for DDD Orthodox Self-Sufficiency (1 SP)
 

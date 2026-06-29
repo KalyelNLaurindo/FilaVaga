@@ -84,6 +84,8 @@ class ArgparseCLIAdapter:
             description="FilaVaga Engine - Local High-Precision Queue CLI Management Tool"
         )
         parser.add_argument("--lang", "-l", help="Language code (pt, en, es, fr, de)")
+        parser.add_argument("--no-color", action="store_true", help="Disable all color/ANSI escape output sequences")
+        parser.add_argument("--linear", "--accessible", action="store_true", dest="linear", help="Render output in linear format for screen readers")
         subparsers = parser.add_subparsers(dest="command", required=False, help="Available commands")
 
         # 1. Register Command Subparser
@@ -104,6 +106,14 @@ class ArgparseCLIAdapter:
 
         # Parse args
         parsed_args = parser.parse_args(args)
+
+        if parsed_args.no_color:
+            self._presenter.no_color = True
+            if self._presenter.console:
+                self._presenter.console._color_system = None
+
+        if parsed_args.linear:
+            self._presenter.linear = True
 
         if self._translation_service:
             resolved_lang = self._translation_service.resolve_lang(parsed_args.lang)

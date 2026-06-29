@@ -132,7 +132,7 @@ class ArgparseCLIAdapter:
 
         if parsed_args.no_color:
             self._presenter.no_color = True
-            if self._presenter.console:
+            if self._presenter.console is not None:
                 self._presenter.console._color_system = None
 
         if parsed_args.linear:

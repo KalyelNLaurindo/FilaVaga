@@ -13,6 +13,7 @@ from filavaga.application.services.queue_manager import QueueManager
 from filavaga.application.services.match_engine import MatchEngine
 from filavaga.application.services.csv_importer import CSVImportService
 from filavaga.application.services.archive_service import ArchiveService
+from filavaga.application.services.config_wizard import ConfigWizardService
 from filavaga.infra.cli.command_router import ArgparseCLIAdapter
 from filavaga.infra.cli.presenter import RichConsolePresenter
 from filavaga.infra.logger import configure_logging
@@ -28,7 +29,7 @@ def main():
     # 0. Configure structured logging to stderr
     configure_logging()
     
-    # 1. Determine local snapshot persistence path
+    # 1. Determine local snapshot persistence path and config path
     home_dir = os.path.expanduser("~")
     db_path = os.path.join(home_dir, ".filavaga", "state_snapshot.json")
     
@@ -44,6 +45,7 @@ def main():
     match_engine = MatchEngine(uow, clock)
     csv_importer = CSVImportService(uow, clock)
     archive_service = ArchiveService(uow, clock)
+    config_wizard = ConfigWizardService()
     
     # 4. Instantiate CLI Adapter (Inbound controller) and run
     cli_adapter = ArgparseCLIAdapter(
@@ -53,7 +55,8 @@ def main():
         repository=repository,
         translation_service=translation_service,
         import_usecase=csv_importer,
-        archive_usecase=archive_service
+        archive_usecase=archive_service,
+        config_wizard_usecase=config_wizard
     )
     cli_adapter.run()
 

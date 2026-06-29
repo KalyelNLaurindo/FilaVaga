@@ -93,3 +93,16 @@ class IArchiveCandidatesUseCase(ABC):
             The number of candidates successfully archived.
         """
         pass
+
+
+class IConfigWizardUseCase(ABC):
+    """
+    Interface for the interactive configuration wizard use case.
+    """
+
+    @abstractmethod
+    def run_wizard(self) -> None:
+        """
+        Start the interactive terminal prompts flow and write atomic config updates.
+        """
+        pass

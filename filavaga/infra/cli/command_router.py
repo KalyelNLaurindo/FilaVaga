@@ -10,7 +10,7 @@ import os
 import sys
 import secrets
 import argparse
-from filavaga.application.ports.inbound import IRegisterCandidateUseCase, IMatchVacancyUseCase, IImportCSVUseCase, IArchiveCandidatesUseCase
+from filavaga.application.ports.inbound import IRegisterCandidateUseCase, IMatchVacancyUseCase, IImportCSVUseCase, IArchiveCandidatesUseCase, IConfigWizardUseCase
 from filavaga.application.ports.outbound import IStateRepository
 from filavaga.core.exceptions import FilaVagaDomainError
 from filavaga.infra.cli.presenter import RichConsolePresenter
@@ -68,6 +68,7 @@ class ArgparseCLIAdapter:
         translation_service = None,
         import_usecase: IImportCSVUseCase | None = None,
         archive_usecase: IArchiveCandidatesUseCase | None = None,
+        config_wizard_usecase: IConfigWizardUseCase | None = None,
     ):
         """
         Initialize the adapter with required inbound use cases.
@@ -79,6 +80,7 @@ class ArgparseCLIAdapter:
         self._translation_service = translation_service
         self._import_usecase = import_usecase
         self._archive_usecase = archive_usecase
+        self._config_wizard_usecase = config_wizard_usecase
 
     def run(self, args: list[str] | None = None) -> None:
         """
@@ -115,6 +117,9 @@ class ArgparseCLIAdapter:
         # 6. Archive Command Subparser
         archive_parser = subparsers.add_parser("archive", help="Archive old placed or rejected candidates")
         archive_parser.add_argument("--days", type=int, default=30, help="Number of days threshold to consider candidates old")
+
+        # 7. Config Wizard Command Subparser
+        subparsers.add_parser("config-wizard", help="Start the interactive configuration setup wizard")
 
         # Parse args
         parsed_args = parser.parse_args(args)
@@ -172,6 +177,11 @@ class ArgparseCLIAdapter:
                     raise RuntimeError("Archive usecase is not configured.")
                 count = self._archive_usecase.archive_candidates(days=parsed_args.days)
                 print(f"Success: Archived {count} candidates to archive_snapshot.json.")
+
+            elif command == "config-wizard":
+                if not self._config_wizard_usecase:
+                    raise RuntimeError("Config wizard usecase is not configured.")
+                self._config_wizard_usecase.run_wizard()
 
             elif command == "purge-all":
                 db_path = None

@@ -159,6 +159,12 @@ class Queue:
         # Chronological sort using registered_at timestamp
         self.entries.sort(key=lambda entry: entry.registered_at)
 
+    def remove_candidate(self, candidate_id: str) -> None:
+        """
+        Remove a candidate from the queue entries.
+        """
+        self.entries = [entry for entry in self.entries if entry.candidate_id != candidate_id]
+
 
 
 

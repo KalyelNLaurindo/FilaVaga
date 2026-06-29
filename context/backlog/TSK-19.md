@@ -11,11 +11,11 @@ Create an automated archiving routine to move candidates with final statuses (`P
 
 ## ✅ Definition of Ready (DoR)
 
-* [ ] Custom outbound port `IArchiveRepository` defined.
-* [ ] Mock system clock configured to test time-based transitions.
+* [x] Custom outbound port `IArchiveRepository` defined.
+* [x] Mock system clock configured to test time-based transitions.
 
 ## 🏁 Definition of Done (DoD) & Acceptance Criteria
 
-* [ ] Implement CLI command route: `filavaga archive --days <number_of_days>`.
-* [ ] Atomic write guarantees apply to both the active file and the archive file during the transition, preventing data loss in case of system power failure.
-* [ ] Unit tests verify that matching lookups exclude archived candidates, and active query latency remains extremely low.
+* [x] Implement CLI command route: `filavaga archive --days <number_of_days>`.
+* [x] Atomic write guarantees apply to both the active file and the archive file during the transition, preventing data loss in case of system power failure.
+* [x] Unit tests verify that matching lookups exclude archived candidates, and active query latency remains extremely low.

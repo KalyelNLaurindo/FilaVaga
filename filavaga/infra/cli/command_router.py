@@ -10,7 +10,7 @@ import os
 import sys
 import secrets
 import argparse
-from filavaga.application.ports.inbound import IRegisterCandidateUseCase, IMatchVacancyUseCase, IImportCSVUseCase
+from filavaga.application.ports.inbound import IRegisterCandidateUseCase, IMatchVacancyUseCase, IImportCSVUseCase, IArchiveCandidatesUseCase
 from filavaga.application.ports.outbound import IStateRepository
 from filavaga.core.exceptions import FilaVagaDomainError
 from filavaga.infra.cli.presenter import RichConsolePresenter
@@ -67,6 +67,7 @@ class ArgparseCLIAdapter:
         repository: IStateRepository | None = None,
         translation_service = None,
         import_usecase: IImportCSVUseCase | None = None,
+        archive_usecase: IArchiveCandidatesUseCase | None = None,
     ):
         """
         Initialize the adapter with required inbound use cases.
@@ -77,6 +78,7 @@ class ArgparseCLIAdapter:
         self._repository = repository
         self._translation_service = translation_service
         self._import_usecase = import_usecase
+        self._archive_usecase = archive_usecase
 
     def run(self, args: list[str] | None = None) -> None:
         """
@@ -109,6 +111,10 @@ class ArgparseCLIAdapter:
         # 5. Import CSV Command Subparser
         import_parser = subparsers.add_parser("import-csv", help="Import candidates or vacancies from a CSV file")
         import_parser.add_argument("--file", required=True, help="Path to the CSV file to import")
+
+        # 6. Archive Command Subparser
+        archive_parser = subparsers.add_parser("archive", help="Archive old placed or rejected candidates")
+        archive_parser.add_argument("--days", type=int, default=30, help="Number of days threshold to consider candidates old")
 
         # Parse args
         parsed_args = parser.parse_args(args)
@@ -160,6 +166,12 @@ class ArgparseCLIAdapter:
                 cand_count = res.get("candidates", 0)
                 vac_count = res.get("vacancies", 0)
                 print(f"Success: Import completed. Loaded {cand_count} candidates and {vac_count} vacancies.")
+
+            elif command == "archive":
+                if not self._archive_usecase:
+                    raise RuntimeError("Archive usecase is not configured.")
+                count = self._archive_usecase.archive_candidates(days=parsed_args.days)
+                print(f"Success: Archived {count} candidates to archive_snapshot.json.")
 
             elif command == "purge-all":
                 db_path = None

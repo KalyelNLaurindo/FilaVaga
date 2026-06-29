@@ -10,7 +10,7 @@ import os
 import sys
 import secrets
 import argparse
-from filavaga.application.ports.inbound import IRegisterCandidateUseCase, IMatchVacancyUseCase, IImportCSVUseCase, IArchiveCandidatesUseCase, IConfigWizardUseCase
+from filavaga.application.ports.inbound import IRegisterCandidateUseCase, IMatchVacancyUseCase, IImportCSVUseCase, IArchiveCandidatesUseCase, IConfigWizardUseCase, IExportStatsUseCase
 from filavaga.application.ports.outbound import IStateRepository
 from filavaga.core.exceptions import FilaVagaDomainError
 from filavaga.infra.cli.presenter import RichConsolePresenter
@@ -69,6 +69,7 @@ class ArgparseCLIAdapter:
         import_usecase: IImportCSVUseCase | None = None,
         archive_usecase: IArchiveCandidatesUseCase | None = None,
         config_wizard_usecase: IConfigWizardUseCase | None = None,
+        export_stats_usecase: IExportStatsUseCase | None = None,
     ):
         """
         Initialize the adapter with required inbound use cases.
@@ -81,6 +82,7 @@ class ArgparseCLIAdapter:
         self._import_usecase = import_usecase
         self._archive_usecase = archive_usecase
         self._config_wizard_usecase = config_wizard_usecase
+        self._export_stats_usecase = export_stats_usecase
 
     def run(self, args: list[str] | None = None) -> None:
         """
@@ -121,12 +123,16 @@ class ArgparseCLIAdapter:
         # 7. Config Wizard Command Subparser
         subparsers.add_parser("config-wizard", help="Start the interactive configuration setup wizard")
 
+        # 8. Export Stats Command Subparser
+        export_parser = subparsers.add_parser("export-stats", help="Export anonymized regional placement KPIs to CSV")
+        export_parser.add_argument("--output", required=True, help="Path to write the CSV report file")
+
         # Parse args
         parsed_args = parser.parse_args(args)
 
         if parsed_args.no_color:
             self._presenter.no_color = True
-            if self._presenter.console:
+            if self._presenter.console is not None:
                 self._presenter.console._color_system = None
 
         if parsed_args.linear:
@@ -182,6 +188,12 @@ class ArgparseCLIAdapter:
                 if not self._config_wizard_usecase:
                     raise RuntimeError("Config wizard usecase is not configured.")
                 self._config_wizard_usecase.run_wizard()
+
+            elif command == "export-stats":
+                if not self._export_stats_usecase:
+                    raise RuntimeError("Export stats usecase is not configured.")
+                self._export_stats_usecase.export_stats(output_path=parsed_args.output)
+                print(f"Success: Exported analytics metrics to {parsed_args.output}.")
 
             elif command == "purge-all":
                 db_path = None

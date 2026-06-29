@@ -283,7 +283,6 @@ Tasks are mapped bottom-up matching the hexagonal boundaries and dependencies.
 - [ ] [**TSK-24**](backlog/TSK-24.md)**:** Candidate Profile Schema Validator (2 SP)
 - [ ] [**TSK-25**](backlog/TSK-25.md)**:** Queue Snapshot Serializer & Replay (4 SP)
 - [ ] [**TSK-34**](backlog/TSK-34.md)**:** HTTP REST API Backend Server Integration (3 SP)
-- [ ] [**TSK-35**](backlog/TSK-35.md)**:** Terminal UI/UX Overhaul — Interactive Shell Visual Redesign (3 SP)
 
 
 
@@ -326,5 +325,6 @@ _None._
 - [x] [**TSK-31**](backlog/TSK-31.md)**:** CLI Accessibility Suite (Support for --no-color and Screen-Reader Linearization) (1 SP)
 - [x] [**TSK-32**](backlog/TSK-32.md)**:** Implement Unit of Work (UoW) Pattern for Multi-Repository Atomic Transactions (2 SP)
 - [x] [**TSK-33**](backlog/TSK-33.md)**:** Refactor Queue Aggregate for DDD Orthodox Self-Sufficiency (1 SP)
+- [x] [**TSK-35**](backlog/TSK-35.md)**:** Terminal UI/UX Overhaul — Interactive Shell Visual Redesign (3 SP)
 
 _Signed by:_ Kalyel N. Laurindo / Project Owner

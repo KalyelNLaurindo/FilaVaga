@@ -13,6 +13,18 @@ dist/
 *.tmp
 logs/*.log
 
+# Coverage reports (generated locally — not for version control)
+.coverage
+coverage.xml
+htmlcov/
+
+# Environment and secrets (never commit these)
+.env
+*.env.*
+*.pem
+*.key
+*.p12
+
 # AI assistant context files (not for version control)
 context/CLAUDE*.md
 context/GEMINI*.md

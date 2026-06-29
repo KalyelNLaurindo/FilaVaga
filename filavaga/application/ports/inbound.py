@@ -54,3 +54,22 @@ class IMatchVacancyUseCase(ABC):
             The matching Candidate entity, or None if no eligible candidate is found.
         """
         pass
+
+
+class IImportCSVUseCase(ABC):
+    """
+    Interface for the CSV data import use case.
+    """
+
+    @abstractmethod
+    def import_csv(self, filepath: str) -> dict[str, int]:
+        """
+        Parse candidates and vacancies from a CSV file, validate, sanitize, and persist them.
+        
+        Args:
+            filepath: Path to the CSV file.
+            
+        Returns:
+            A dictionary containing counts of imported entities, e.g. {"candidates": X, "vacancies": Y}
+        """
+        pass

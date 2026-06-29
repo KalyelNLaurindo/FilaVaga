@@ -11,6 +11,7 @@ from filavaga.infra.persistence.system_clock import SystemClock
 from filavaga.infra.persistence.atomic_json import AtomicJsonRepository, JsonUnitOfWork
 from filavaga.application.services.queue_manager import QueueManager
 from filavaga.application.services.match_engine import MatchEngine
+from filavaga.application.services.csv_importer import CSVImportService
 from filavaga.infra.cli.command_router import ArgparseCLIAdapter
 from filavaga.infra.cli.presenter import RichConsolePresenter
 from filavaga.infra.logger import configure_logging
@@ -40,6 +41,7 @@ def main():
     # 3. Instantiate Core Services (Inbound Ports implementation)
     queue_manager = QueueManager(uow, clock)
     match_engine = MatchEngine(uow, clock)
+    csv_importer = CSVImportService(uow, clock)
     
     # 4. Instantiate CLI Adapter (Inbound controller) and run
     cli_adapter = ArgparseCLIAdapter(
@@ -47,7 +49,8 @@ def main():
         match_usecase=match_engine,
         presenter=presenter,
         repository=repository,
-        translation_service=translation_service
+        translation_service=translation_service,
+        import_usecase=csv_importer
     )
     cli_adapter.run()
 

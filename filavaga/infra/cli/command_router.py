@@ -10,7 +10,7 @@ import os
 import sys
 import secrets
 import argparse
-from filavaga.application.ports.inbound import IRegisterCandidateUseCase, IMatchVacancyUseCase
+from filavaga.application.ports.inbound import IRegisterCandidateUseCase, IMatchVacancyUseCase, IImportCSVUseCase
 from filavaga.application.ports.outbound import IStateRepository
 from filavaga.core.exceptions import FilaVagaDomainError
 from filavaga.infra.cli.presenter import RichConsolePresenter
@@ -66,6 +66,7 @@ class ArgparseCLIAdapter:
         presenter: RichConsolePresenter | None = None,
         repository: IStateRepository | None = None,
         translation_service = None,
+        import_usecase: IImportCSVUseCase | None = None,
     ):
         """
         Initialize the adapter with required inbound use cases.
@@ -75,6 +76,7 @@ class ArgparseCLIAdapter:
         self._presenter = presenter or RichConsolePresenter()
         self._repository = repository
         self._translation_service = translation_service
+        self._import_usecase = import_usecase
 
     def run(self, args: list[str] | None = None) -> None:
         """
@@ -101,6 +103,10 @@ class ArgparseCLIAdapter:
 
         # 4. Purge All Command Subparser (LGPD Compliance)
         subparsers.add_parser("purge-all", help="Safely and permanently purge all candidate data and local snapshots")
+
+        # 5. Import CSV Command Subparser
+        import_parser = subparsers.add_parser("import-csv", help="Import candidates or vacancies from a CSV file")
+        import_parser.add_argument("--file", required=True, help="Path to the CSV file to import")
 
         # Parse args
         parsed_args = parser.parse_args(args)
@@ -136,6 +142,14 @@ class ArgparseCLIAdapter:
                     raise RuntimeError("Repository is not configured for dashboard view.")
                 
                 self._run_interactive_dashboard_loop()
+
+            elif command == "import-csv":
+                if not self._import_usecase:
+                    raise RuntimeError("Import usecase is not configured.")
+                res = self._import_usecase.import_csv(filepath=parsed_args.file)
+                cand_count = res.get("candidates", 0)
+                vac_count = res.get("vacancies", 0)
+                print(f"Success: Import completed. Loaded {cand_count} candidates and {vac_count} vacancies.")
 
             elif command == "purge-all":
                 db_path = None

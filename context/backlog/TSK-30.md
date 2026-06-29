@@ -21,7 +21,7 @@ This task includes:
 
 ## 🏁 Definition of Done (DoD) & Acceptance Criteria
 
-* [ ] **[Functional - Interactive]:** The CLI supports dynamic session language switching when entering `L` or executing `--lang`.
-* [ ] **[Functional - UX]:** Renders unified single-character keyboard shortcuts inside the interactive prompt loops, allowing counselors to execute actions without typing full command names.
-* [ ] **[Functional - Fallback]:** Unicode box layouts fallback to simple ASCII boxes if the terminal session fails to support advanced typography.
-* [ ] **[Verification]:** `pytest tests/test_infra.py` passes 100% green.
+* [x] **[Functional - Interactive]:** The CLI supports dynamic session language switching when entering `L` or executing `--lang`.
+* [x] **[Functional - UX]:** Renders unified single-character keyboard shortcuts inside the interactive prompt loops, allowing counselors to execute actions without typing full command names.
+* [x] **[Functional - Fallback]:** Unicode box layouts fallback to simple ASCII boxes if the terminal session fails to support advanced typography.
+* [x] **[Verification]:** `pytest tests/test_infra.py` passes 100% green.

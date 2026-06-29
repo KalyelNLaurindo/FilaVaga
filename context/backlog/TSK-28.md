@@ -20,7 +20,7 @@ The translation system will:
 
 ## 🏁 Definition of Done (DoD) & Acceptance Criteria
 
-* [ ] **[Testing/Quality - TDD]:** Unit tests verify that `TranslationService` successfully loads translation JSON keys and formats parameterized strings correctly for all 5 languages.
-* [ ] **[Functional - Resolution]:** `TranslationService` resolves the correct locale according to precedence: 1. CLI flag, 2. `config.json` entry, 3. OS Env variables, 4. Default fallback (`pt`).
-* [ ] **[Functional - Security]:** The file path resolver for locales sanitizes language input strings and blocks any directory traversal or arbitrary file access.
-* [ ] **[Verification]:** `pytest tests/test_infra.py` passes 100% green.
+* [x] **[Testing/Quality - TDD]:** Unit tests verify that `TranslationService` successfully loads translation JSON keys and formats parameterized strings correctly for all 5 languages.
+* [x] **[Functional - Resolution]:** `TranslationService` resolves the correct locale according to precedence: 1. CLI flag, 2. `config.json` entry, 3. OS Env variables, 4. Default fallback (`pt`).
+* [x] **[Functional - Security]:** The file path resolver for locales sanitizes language input strings and blocks any directory traversal or arbitrary file access.
+* [x] **[Verification]:** `pytest tests/test_infra.py` passes 100% green.

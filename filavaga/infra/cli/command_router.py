@@ -237,8 +237,11 @@ class ArgparseCLIAdapter:
         """
         from filavaga.core.exceptions import FilaVagaDomainError
 
+        # 1. Print branded ASCII art banner on startup
+        self._presenter.display_welcome_banner()
+
         while True:
-            # 1. Fetch current repository files state
+            # 2. Fetch current repository files state
             candidates_map = self._repository.get_all_candidates() if self._repository else {}
             vacancies_map = self._repository.get_all_vacancies() if self._repository else {}
 
@@ -253,7 +256,7 @@ class ArgparseCLIAdapter:
                 if q:
                     queues_map[code] = q
 
-            # 2. Print status header
+            # 3. Print status header
             lang_code = self._translation_service._active_lang if self._translation_service else "pt"
             db_path_str = self._repository.filepath if self._repository else "In-Memory"
             db_status_str = "OK" if self._repository and os.path.exists(os.path.dirname(self._repository.filepath)) else "N/A"
@@ -266,20 +269,26 @@ class ArgparseCLIAdapter:
             )
             self._presenter.console.print(f"[bold white on blue]{status_header}[/bold white on blue]")
 
-            # 3. Print main dashboard
+            # 4. Print main dashboard layout
             self._presenter.display_dashboard(
                 candidates=candidates_map,
                 vacancies=vacancies_map,
                 queues=queues_map
             )
 
-            # 4. Display options menu
+            # 5. Display options menu and prompt
             options_text = self._presenter.translation_service.translate("menu_options")
             prompt_text = self._presenter.translation_service.translate("menu_prompt")
             self._presenter.console.print(f"[bold yellow]{options_text}[/bold yellow]")
 
+            # Build cyan 'filavaga ❯' prefix for the REPL prompt
+            if not self._presenter.no_color:
+                prompt_styled = f"\033[36mfilavaga\033[0m ❯ {prompt_text}"
+            else:
+                prompt_styled = f"filavaga ❯ {prompt_text}"
+
             try:
-                choice = input(prompt_text).strip().lower()
+                choice = input(prompt_styled).strip().lower()
             except (KeyboardInterrupt, EOFError):
                 break
 
@@ -345,3 +354,6 @@ class ArgparseCLIAdapter:
                     self._translation_service.load_language(selected_lang)
                     # Sync presenter i18n
                     self._presenter.translation_service = self._translation_service
+
+            # Output thin separator divider at end of cycle
+            self._presenter.display_separator()

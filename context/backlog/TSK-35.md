@@ -33,11 +33,11 @@ The current interactive CLI loop (`filavaga>` prompt) is functional but visually
 
 ## 🏁 Definition of Done (DoD) & Acceptance Criteria
 
-* [ ] **[Functional - Banner]:** Launching `filavaga.exe` or `python -m filavaga` displays a branded ASCII banner with name, version, and tagline before entering the prompt.
-* [ ] **[Functional - Prompt]:** The REPL prompt renders as a colored `filavaga ❯` with user input in default color.
-* [ ] **[Functional - Feedback Icons]:** All success/error/warning/info outputs consistently prepend the appropriate icon across every command (`add-candidate`, `add-vacancy`, `fill-queue`, `status`, `purge`, etc.).
-* [ ] **[Functional - Tables]:** Queue listings and match results render inside Unicode box borders with aligned columns.
-* [ ] **[Functional - Separators]:** A thin `─` divider is printed after each command output in the REPL cycle.
-* [ ] **[Functional - Fallback]:** `NO_COLOR=1` or `--no-color` strips ANSI codes and replaces Unicode box chars with plain ASCII equivalents (`+`, `-`, `|`).
-* [ ] **[Testing/Quality - TDD]:** Visual rendering helpers are unit-tested via `capsys` stdout capture, asserting presence of icons, borders, and dividers per scenario.
-* [ ] **[Verification]:** `python -m pytest` runs successfully with 100% pass rate (no regressions).
+* [x] **[Functional - Banner]:** Launching `filavaga.exe` or `python -m filavaga` displays a branded ASCII banner with name, version, and tagline before entering the prompt.
+* [x] **[Functional - Prompt]:** The REPL prompt renders as a colored `filavaga ❯` with user input in default color.
+* [x] **[Functional - Feedback Icons]:** All success/error/warning/info outputs consistently prepend the appropriate icon across every command (`add-candidate`, `add-vacancy`, `fill-queue`, `status`, `purge`, etc.).
+* [x] **[Functional - Tables]:** Queue listings and match results render inside Unicode box borders with aligned columns.
+* [x] **[Functional - Separators]:** A thin `─` divider is printed after each command output in the REPL cycle.
+* [x] **[Functional - Fallback]:** `NO_COLOR=1` or `--no-color` strips ANSI codes and replaces Unicode box chars with plain ASCII equivalents (`+`, `-`, `|`).
+* [x] **[Testing/Quality - TDD]:** Visual rendering helpers are unit-tested via `capsys` stdout capture, asserting presence of icons, borders, and dividers per scenario.
+* [x] **[Verification]:** `python -m pytest` runs successfully with 100% pass rate (no regressions).

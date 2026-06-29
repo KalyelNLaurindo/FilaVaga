@@ -78,7 +78,7 @@ def test_presenter_translation_dashboard(tmp_path):
     service_es = TranslationService(locales_dir=str(locales_dir), default_lang="pt")
     service_es.resolve_lang(cli_lang="es")
     
-    console = Console(record=True, width=120)
+    console = Console(record=True, width=180)
     presenter = RichConsolePresenter(console=console, translation_service=service_es)
 
     candidates = {
